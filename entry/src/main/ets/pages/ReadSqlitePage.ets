@@ -1,9 +1,9 @@
 import SqliteHelper from '../db/SqliteHelper';
 import { relationalStore } from '@kit.ArkData';
 import { DownloadInfo } from '../model/DownloadInfo';
-import { request } from '@kit.BasicServicesKit';
 import { Logger } from '../utils/Logger';
 import { DownloadFileUtil } from '../utils/DownloadFileUtil';
+import { request } from '@kit.BasicServicesKit';
 
 @Entry
 @Component
@@ -149,18 +149,16 @@ struct ReadSqlitePage {
                     const taskObj = await request.agent.getTask(getContext(), item.taskId)
                     taskObj.pause();
                   } else if (item.status === 0) {
-                    // let predicates = new relationalStore.RdbPredicates('downloadinfo');
-                    // predicates.equalTo('downloadId', item.downloadId);
-
                     DownloadFileUtil.downloadFile([{
                       id: item.downloadId,
                       url: item.url,
                       // title:
                       status: item.status,
-                      begins: item.downloadSize,
+                      begins: item.begins,
                     }], (downloadSize, fileSize, status, i) => {
 
                     })
+
                   }
                 } catch (e) {
                   Logger.init({
