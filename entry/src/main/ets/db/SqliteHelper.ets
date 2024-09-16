@@ -48,7 +48,7 @@ export default class SqliteHelper {
       + "status INTEGER DEFAULT 3 , " //下载状态  待下载、下载中、已下载、已暂停、下载失败 默认待下载
       + "downloadId TEXT, " //下载列表每项id
       + "moduleType INTEGER, " //资料下载 、缓存课程
-      + "begins INTEGER" //开始下载位置
+      + "begins INTEGER"
       + ")";
     try {
       SqliteHelper.rdbStore = await relationalStore.getRdbStore(this.context, STORE_CONFIG)
@@ -70,7 +70,7 @@ export default class SqliteHelper {
       SqliteHelper.rdbStore ?.insert(tabName, data).then(number => {
         resolve(number);
       }).catch((err: BusinessError) => {
-        reject(0)
+        reject(err)
       })
     })
   }
@@ -83,7 +83,7 @@ export default class SqliteHelper {
       SqliteHelper.rdbStore?.delete(predicates).then(number => {
         resolve(number);
       }).catch((e: BusinessError) => {
-        reject(0);
+        reject(e);
       })
     })
   }
@@ -97,7 +97,7 @@ export default class SqliteHelper {
       SqliteHelper.rdbStore?.update(data, predicates).then(number => {
         resolve(number);
       }).catch((err: BusinessError) => {
-        reject(0);
+        reject(err);
       })
     })
   }
@@ -130,7 +130,7 @@ export default class SqliteHelper {
         resultSet?.close()
         // 释放数据集的内存
       }).catch((e: BusinessError) => {
-        reject([]);
+        reject(e);
       })
     })
   }

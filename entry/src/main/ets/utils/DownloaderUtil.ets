@@ -9,9 +9,10 @@ export interface IDownload {
   id: string;
   pro?: number;
   status?: number;
-  begins: number;
+  begins?: number;
   moduleType?: number;
   title?: string;
+
 }
 
 export class DownloaderUtil {
@@ -31,12 +32,12 @@ export class DownloaderUtil {
     await taskObj.pause();
   }
 
-  static async resume(taskId: string) {
+  static async resume(taskId: string, callback?: (code: number) => void) {
     try {
       const taskObj = await request.agent.getTask(getContext(), taskId);
-      taskObj.resume();
+      await taskObj.resume();
     } catch (e) {
-      console.log("异常信息", '走了')
+      callback?.(e.code);
     }
   }
 
@@ -69,7 +70,7 @@ export class DownloaderUtil {
           'fileName': fileName,
           'downloadId': item.id, //必传
           'moduleType': 2,
-          'begins': item.begins ?? 0 //必传
+          "begins": item.begins ?? 0
         }
         let predicates = new relationalStore.RdbPredicates('downloadinfo');
         predicates.equalTo('downloadId', item.id);

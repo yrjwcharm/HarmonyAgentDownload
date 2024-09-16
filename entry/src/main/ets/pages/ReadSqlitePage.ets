@@ -1,7 +1,6 @@
 import SqliteHelper from '../db/SqliteHelper';
 import { relationalStore } from '@kit.ArkData';
 import { DownloadInfo } from '../model/DownloadInfo';
-import { Logger } from '../utils/Logger';
 import { DownloaderUtil } from '../utils/DownloaderUtil';
 
 @Entry
@@ -143,19 +142,38 @@ struct ReadSqlitePage {
                   right: 16
                 })
               }.onClick(async () => {
-                try {
-                  if (item.status === 2) {
-                    DownloaderUtil.pause(item.taskId);
-                  } else if (item.status === 0) {
-                    DownloaderUtil.resume(item.taskId);
-                    
-                  }
-                } catch (e) {
-                  Logger.init({
-                    tag: '异常',
+                if (item.status === 2) {
+                  DownloaderUtil.pause(item.taskId);
+                } else if (item.status === 0) {
+                  DownloaderUtil.downloadFile([{
+                    id: item.downloadId,
+                    url: item.url,
+                    // title:
+                    status: item.status,
+                    begins: item.begins ?? 0,
+                  }], (downloadSize, fileSize, status, i) => {
+
                   })
-                  Logger.debug(e);
+                  // try {
+                  //   DownloaderUtil.resume(item.taskId, (code) => {
+                  //     if (code > 0) {
+                  //       DownloaderUtil.downloadFile([{
+                  //         id: item.downloadId,
+                  //         url: item.url,
+                  //         // title:
+                  //         status: item.status,
+                  //         begins: item.begins ?? 0,
+                  //       }], (downloadSize, fileSize, status, i) => {
+                  //
+                  //       })
+                  //     }
+                  //   });
+                  // } catch (e) {
+                  //
+                  // }
+
                 }
+
               })
             }))
           }

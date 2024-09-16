@@ -42,7 +42,7 @@ struct MultiFileDownload {
   ]
 
   async aboutToAppear() {
-    BackgroundTaskManager.getInstance(getContext()).requestSuspendDelay();
+    // BackgroundTaskManager.getInstance(getContext()).requestSuspendDelay();
     // BackgroundTaskManager.getInstance(getContext()).startContinuousTask();
 
     let predicates = new relationalStore.RdbPredicates('downloadinfo');
@@ -50,7 +50,7 @@ struct MultiFileDownload {
     list.forEach(obj => {
       this.downloadList?.forEach((item) => {
         if (item.id === obj.downloadId) {
-          item.pro =
+          item.pro = Math.trunc(obj.downloadSize * 100 / obj.fileSize);
           item.status = obj.status;
           item.begins = obj.downloadSize;
         }
