@@ -144,6 +144,7 @@ struct ReadSqlitePage {
               }.onClick(async () => {
                 if (item.status === 2) {
                   DownloaderUtil.pause(item.taskId);
+
                 } else if (item.status === 0) {
                   DownloaderUtil.downloadFile([{
                     id: item.downloadId,
