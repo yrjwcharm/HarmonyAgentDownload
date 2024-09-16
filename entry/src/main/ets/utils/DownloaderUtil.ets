@@ -2,7 +2,6 @@ import { request } from '@kit.BasicServicesKit';
 import { relationalStore, ValuesBucket } from '@kit.ArkData';
 import { Logger } from './Logger';
 import { DownloadManager } from '../downloadmanager/DownloadManager';
-import SqliteHelper from '../db/SqliteHelper';
 
 
 export interface IDownload {
@@ -31,11 +30,11 @@ export class DownloaderUtil {
   static async pause(taskId: string) {
     const taskObj = await request.agent.getTask(getContext(), taskId);
     await taskObj.pause();
-    let predicate = new relationalStore.RdbPredicates('downloadinfo');
-    predicate.equalTo('taskId', taskId);
-    SqliteHelper.getInstance(getContext()).update({
-      'begins': 0
-    }, predicate)
+    // let predicate = new relationalStore.RdbPredicates('downloadinfo');
+    // predicate.equalTo('taskId', taskId);
+    // SqliteHelper.getInstance(getContext()).update({
+    //   'begins': 0
+    // }, predicate)
   }
 
   static async resume(taskId: string, callback?: (code: number) => void) {
