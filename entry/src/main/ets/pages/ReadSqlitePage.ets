@@ -146,32 +146,34 @@ struct ReadSqlitePage {
                   DownloaderUtil.pause(item.taskId);
 
                 } else if (item.status === 0) {
-                  DownloaderUtil.downloadFile([{
-                    id: item.downloadId,
-                    url: item.url,
-                    // title:
-                    status: item.status,
-                    begins: item.begins ?? 0,
-                  }], (downloadSize, fileSize, status, i) => {
+                  try {
+                    DownloaderUtil.downloadFile([{
+                      id: item.downloadId,
+                      url: item.url,
+                      // title:
+                      status: item.status,
+                      begins: item.begins ?? 0,
+                    }], (downloadSize, fileSize, status, i) => {
 
-                  })
-                  // try {
-                  //   DownloaderUtil.resume(item.taskId, (code) => {
-                  //     if (code > 0) {
-                  //       DownloaderUtil.downloadFile([{
-                  //         id: item.downloadId,
-                  //         url: item.url,
-                  //         // title:
-                  //         status: item.status,
-                  //         begins: item.begins ?? 0,
-                  //       }], (downloadSize, fileSize, status, i) => {
-                  //
-                  //       })
-                  //     }
-                  //   });
-                  // } catch (e) {
-                  //
-                  // }
+                    })
+                    // DownloaderUtil.resume(item.taskId, async (code) => {
+                    //   if (code > 0) {
+                    //     DownloaderUtil.downloadFile([{
+                    //       id: item.downloadId,
+                    //       url: item.url,
+                    //       // title:
+                    //       status: item.status,
+                    //       begins: item.begins ?? 0,
+                    //     }], (downloadSize, fileSize, status, i) => {
+                    //
+                    //     })
+                    //   } else {
+                    //     await DownloaderUtil.resume(item.taskId);
+                    //   }
+                    // });
+                  } catch (e) {
+
+                  }
 
                 }
 
