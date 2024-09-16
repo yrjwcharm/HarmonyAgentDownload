@@ -1,4 +1,4 @@
-import { request } from '@kit.BasicServicesKit';
+import { BusinessError, request } from '@kit.BasicServicesKit';
 import { relationalStore, ValuesBucket } from '@kit.ArkData';
 import SqliteHelper from '../db/SqliteHelper';
 import { DownloadStatus } from '../constants/DownloadStatus';
@@ -103,7 +103,7 @@ export class DownloadManager {
       promptAction.showToast({
         message: '下载完毕'
       })
-      DownloadManager.deleteTmpFile(valuesBuket.fileName as string);
+      valuesBuket.begins as number > 0 && DownloadManager.deleteTmpFile(valuesBuket.fileName as string);
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.COMPLETED,
         valuesBuket.downloadId as string,
         downloadTask.tid)
@@ -115,7 +115,7 @@ export class DownloadManager {
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
     if (progress.sizes[0] > -1) {
-      
+
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
@@ -130,21 +130,39 @@ export class DownloadManager {
     }
   }
 
-  // public async resumeCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
-  //   downloadTask: request.agent.Task,
-  //   predicates: relationalStore.RdbPredicates,
-  //   callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
-  //   if (progress.sizes[0] > -1) {
-  //     valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
-  //     valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
-  //     valuesBuket.status = DownloadStatus.PAUSE;
-  //     valuesBuket.begins = progress.processed;
-  //     await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
-  //     callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RESUME,
-  //       valuesBuket.downloadId as string,
-  //       downloadTask.tid)
-  //   }
-  // }
+  public async resumeCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
+    downloadTask: request.agent.Task,
+    predicates: relationalStore.RdbPredicates,
+    callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
+    if (progress.sizes[0] > -1) {
+      let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
+      request.agent.getTask(getContext(), list[0].taskId).then(async (task: request.agent.Task) => {
+        console.info(`Succeeded in querying a upload task. result: ${task.tid}`);
+        valuesBuket.fileSize = progress.sizes[0];
+        valuesBuket.downloadSize = progress.processed;
+        // valuesBuket.status = DownloadStatus.RESUME
+        valuesBuket.begins = 0
+        let dstPath = getContext().cacheDir + "/tmp/" + valuesBuket.fileName;
+        fileIo.rmdirSync(dstPath);
+        await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
+        callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RUNNING,
+          valuesBuket.downloadId as string,
+          downloadTask.tid)
+      }).catch(async (err: BusinessError) => {
+        console.error(`Failed to query a upload task, Code: ${err.code}, message: ${err.message}`);
+        valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
+        valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
+        // valuesBuket.status = DownloadStatus.RESUME
+        valuesBuket.begins = progress.processed + (valuesBuket.begins as number)
+        await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
+        callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RUNNING,
+          valuesBuket.downloadId as string,
+          downloadTask.tid)
+      });
+
+
+    }
+  }
 
   public async failedCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,

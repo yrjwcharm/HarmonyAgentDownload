@@ -91,11 +91,11 @@ export class DownloaderUtil {
             .pausedCallback(valuesBuket, progress, downloadTask, predicates, callback);
 
         }
-        // let resumeCallback = (progress: request.agent.Progress) => {
-        //   DownloadManager.getInstance()
-        //     .resumeCallback(valuesBuket, progress, downloadTask, predicates, callback);
-        //
-        // }
+        let resumeCallback = (progress: request.agent.Progress) => {
+          DownloadManager.getInstance()
+            .resumeCallback(valuesBuket, progress, downloadTask, predicates, callback);
+
+        }
         let failedCallback = (progress: request.agent.Progress) => {
           DownloadManager.getInstance()
             .failedCallback(valuesBuket, progress, downloadTask, predicates, callback);
@@ -104,7 +104,7 @@ export class DownloaderUtil {
         downloadTask.on('progress', progressCallback)
         downloadTask.on('completed', completedCallback);
         downloadTask.on('pause', pauseCallback);
-        // downloadTask.on('resume', resumeCallback);
+        downloadTask.on('resume', resumeCallback);
         downloadTask.on('failed', failedCallback)
         await downloadTask.start();
       } catch (err) {

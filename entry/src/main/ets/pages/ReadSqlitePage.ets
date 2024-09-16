@@ -147,30 +147,30 @@ struct ReadSqlitePage {
 
                 } else if (item.status === 0) {
                   try {
-                    DownloaderUtil.downloadFile([{
-                      id: item.downloadId,
-                      url: item.url,
-                      // title:
-                      status: item.status,
-                      begins: item.begins ?? 0,
-                    }], (downloadSize, fileSize, status, i) => {
-
-                    })
-                    // DownloaderUtil.resume(item.taskId, async (code) => {
-                    //   if (code > 0) {
-                    //     DownloaderUtil.downloadFile([{
-                    //       id: item.downloadId,
-                    //       url: item.url,
-                    //       // title:
-                    //       status: item.status,
-                    //       begins: item.begins ?? 0,
-                    //     }], (downloadSize, fileSize, status, i) => {
+                    // DownloaderUtil.downloadFile([{
+                    //   id: item.downloadId,
+                    //   url: item.url,
+                    //   // title:
+                    //   status: item.status,
+                    //   begins: item.begins ?? 0,
+                    // }], (downloadSize, fileSize, status, i) => {
                     //
-                    //     })
-                    //   } else {
-                    //     await DownloaderUtil.resume(item.taskId);
-                    //   }
-                    // });
+                    // })
+                    DownloaderUtil.resume(item.taskId, async (code) => {
+                      if (code > 0) {
+                        DownloaderUtil.downloadFile([{
+                          id: item.downloadId,
+                          url: item.url,
+                          // title:
+                          status: item.status,
+                          begins: item.begins ?? 0,
+                        }], (downloadSize, fileSize, status, i) => {
+
+                        })
+                      } else {
+                        await DownloaderUtil.resume(item.taskId);
+                      }
+                    });
                   } catch (e) {
 
                   }
