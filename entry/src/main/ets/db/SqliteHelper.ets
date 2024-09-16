@@ -82,6 +82,8 @@ export default class SqliteHelper {
     return new Promise((resolve, reject) => {
       SqliteHelper.rdbStore?.delete(predicates).then(number => {
         resolve(number);
+      }).catch((e: BusinessError) => {
+        reject(0);
       })
     })
   }
@@ -104,29 +106,32 @@ export default class SqliteHelper {
   public queryData(predicates: relationalStore.RdbPredicates): Promise<Array<DownloadInfo>> {
     let list: Array<DownloadInfo> = [];
     return new Promise(async (resolve, reject) => {
-      const resultSet = await SqliteHelper.rdbStore?.query(predicates,
+      SqliteHelper.rdbStore?.query(predicates,
         ['userID', 'taskID', 'url', 'filePath', 'fileName', 'fileSize', 'downLoadSize', 'status', 'downloadId',
-          'moduleType', 'begins']);
-      while (resultSet?.goToNextRow()) {
-        const userId = resultSet.getString(resultSet.getColumnIndex('userID'));
-        const taskId = resultSet.getString(resultSet.getColumnIndex('taskID'));
-        const url = resultSet.getString(resultSet.getColumnIndex('url'));
-        const filePath = resultSet.getString(resultSet.getColumnIndex('filePath'));
-        const fileName = resultSet.getString(resultSet.getColumnIndex('fileName'));
-        const fileSize = resultSet.getLong(resultSet.getColumnIndex('fileSize'));
-        const downLoadSize = resultSet.getLong(resultSet.getColumnIndex('downLoadSize'));
-        const status = resultSet.getLong(resultSet.getColumnIndex('status'))
-        const downloadId = resultSet.getString(resultSet.getColumnIndex('downloadId'))
-        const moduleType = resultSet.getLong(resultSet.getColumnIndex('moduleType'))
-        const begins = resultSet.getLong(resultSet.getColumnIndex('begins'))
-        let downloadInfo: DownloadInfo =
-          new DownloadInfo(userId, taskId, url, filePath, fileName, fileSize, downLoadSize, status, downloadId,
-            moduleType, begins);
-        list.push(downloadInfo);
-      }
-      resolve(list);
-      resultSet?.close()
-      // 释放数据集的内存
+          'moduleType', 'begins']).then(resultSet => {
+        while (resultSet?.goToNextRow()) {
+          const userId = resultSet.getString(resultSet.getColumnIndex('userID'));
+          const taskId = resultSet.getString(resultSet.getColumnIndex('taskID'));
+          const url = resultSet.getString(resultSet.getColumnIndex('url'));
+          const filePath = resultSet.getString(resultSet.getColumnIndex('filePath'));
+          const fileName = resultSet.getString(resultSet.getColumnIndex('fileName'));
+          const fileSize = resultSet.getLong(resultSet.getColumnIndex('fileSize'));
+          const downLoadSize = resultSet.getLong(resultSet.getColumnIndex('downLoadSize'));
+          const status = resultSet.getLong(resultSet.getColumnIndex('status'))
+          const downloadId = resultSet.getString(resultSet.getColumnIndex('downloadId'))
+          const moduleType = resultSet.getLong(resultSet.getColumnIndex('moduleType'))
+          const begins = resultSet.getLong(resultSet.getColumnIndex('begins'))
+          let downloadInfo: DownloadInfo =
+            new DownloadInfo(userId, taskId, url, filePath, fileName, fileSize, downLoadSize, status, downloadId,
+              moduleType, begins);
+          list.push(downloadInfo);
+        }
+        resolve(list);
+        resultSet?.close()
+        // 释放数据集的内存
+      }).catch((e: BusinessError) => {
+        reject([]);
+      })
     })
   }
 }

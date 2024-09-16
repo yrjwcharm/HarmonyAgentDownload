@@ -2,8 +2,7 @@ import SqliteHelper from '../db/SqliteHelper';
 import { relationalStore } from '@kit.ArkData';
 import { DownloadInfo } from '../model/DownloadInfo';
 import { Logger } from '../utils/Logger';
-import { DownloadFileUtil } from '../utils/DownloadFileUtil';
-import { request } from '@kit.BasicServicesKit';
+import { DownloaderUtil } from '../utils/DownloaderUtil';
 
 @Entry
 @Component
@@ -146,19 +145,10 @@ struct ReadSqlitePage {
               }.onClick(async () => {
                 try {
                   if (item.status === 2) {
-                    const taskObj = await request.agent.getTask(getContext(), item.taskId)
-                    taskObj.pause();
+                    DownloaderUtil.pause(item.taskId);
                   } else if (item.status === 0) {
-                    DownloadFileUtil.downloadFile([{
-                      id: item.downloadId,
-                      url: item.url,
-                      // title:
-                      status: item.status,
-                      begins: item.begins,
-                    }], (downloadSize, fileSize, status, i) => {
-
-                    })
-
+                    DownloaderUtil.resume(item.taskId);
+                    
                   }
                 } catch (e) {
                   Logger.init({

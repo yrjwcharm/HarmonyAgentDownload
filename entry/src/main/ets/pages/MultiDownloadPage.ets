@@ -1,8 +1,9 @@
 import { router } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
-import { DownloadFileUtil, IDownload } from '../utils/DownloadFileUtil';
+import { DownloaderUtil, IDownload } from '../utils/DownloaderUtil';
 import { relationalStore } from '@kit.ArkData';
 import { DownloadStatus } from '../constants/DownloadStatus';
+import { BackgroundTaskManager } from '../backgroundtaskmanager/BackgroundTaskManager';
 
 @Entry
 @Component
@@ -41,12 +42,15 @@ struct MultiFileDownload {
   ]
 
   async aboutToAppear() {
+    BackgroundTaskManager.getInstance(getContext()).requestSuspendDelay();
+    // BackgroundTaskManager.getInstance(getContext()).startContinuousTask();
+
     let predicates = new relationalStore.RdbPredicates('downloadinfo');
     let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
     list.forEach(obj => {
       this.downloadList?.forEach((item) => {
         if (item.id === obj.downloadId) {
-          item.pro = Math.trunc(obj.downloadSize * 100 / obj.fileSize);
+          item.pro =
           item.status = obj.status;
           item.begins = obj.downloadSize;
         }
@@ -103,7 +107,7 @@ struct MultiFileDownload {
                 .onClick(() => {
                   if (item.status === DownloadStatus.NO_START || item.status === DownloadStatus.PAUSE ||
                     item.status === DownloadStatus.FAILED) {
-                    DownloadFileUtil.downloadFile([item], (downloadSize, fileSize, status, id) => {
+                    DownloaderUtil.downloadFile([item], (downloadSize, fileSize, status, id) => {
                       this.downloadList = this.downloadList.map((item) => {
                         if (item.id == id) {
                           item.pro = Math.trunc(downloadSize * 100 / fileSize);
@@ -126,7 +130,7 @@ struct MultiFileDownload {
 
       Row() {
         Button('全部下载').onClick(() => {
-          DownloadFileUtil.downloadFile(this.downloadList, (proceed, fileSize, status, id) => {
+          DownloaderUtil.downloadFile(this.downloadList, (proceed, fileSize, status, id) => {
             this.downloadList = this.downloadList.map((item) => {
               if (item.id == id) {
                 item.pro = Math.trunc(proceed * 100 / fileSize);

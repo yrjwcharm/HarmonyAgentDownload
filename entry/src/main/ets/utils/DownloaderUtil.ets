@@ -14,7 +14,7 @@ export interface IDownload {
   title?: string;
 }
 
-export class DownloadFileUtil {
+export class DownloaderUtil {
   static deleteTask = async (downloadTask: request.agent.Task) => {
     try {
       downloadTask.off('progress');
@@ -23,6 +23,20 @@ export class DownloadFileUtil {
       await request.agent.remove(downloadTask.tid);
     } catch (err) {
       Logger.info(`deleteTask fail, err= ${JSON.stringify(err)}`);
+    }
+  }
+
+  static async pause(taskId: string) {
+    const taskObj = await request.agent.getTask(getContext(), taskId);
+    await taskObj.pause();
+  }
+
+  static async resume(taskId: string) {
+    try {
+      const taskObj = await request.agent.getTask(getContext(), taskId);
+      taskObj.resume();
+    } catch (e) {
+      console.log("异常信息", '走了')
     }
   }
 

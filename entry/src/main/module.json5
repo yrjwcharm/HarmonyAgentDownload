@@ -20,9 +20,6 @@
           "when": "inuse"
         }
       },
-      {
-        "name":"ohos.permission.KEEP_BACKGROUND_RUNNING"
-      }
       ],
     "deliveryWithInstall": true,
     "installationFree": false,
@@ -37,7 +34,6 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
-
         "skills": [
           {
             "entities": [

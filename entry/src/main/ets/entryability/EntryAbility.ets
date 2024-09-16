@@ -2,6 +2,8 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
+import { relationalStore } from '@kit.ArkData';
+
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -36,12 +38,23 @@ export default class EntryAbility extends UIAbility {
   }
 
   onForeground() {
-
   }
 
-  onBackground() {
-    // DownloadFileUtil.pauseAllDownload();
+  async onBackground() {
+    console.info(`Succeeded in operationing startBackgroundRunning.`);
+    let predicates = new relationalStore.RdbPredicates('downloadinfo');
+    predicates.equalTo('userID', '1');
+    predicates.equalTo('status', 2);
+    let list = await SqliteHelper.getInstance(this.context).queryData(predicates);
+    for (let i = 0; i < list.length; i++) {
+      // await DownloaderUtil.pause(list[i].taskId);
+      let predicates = new relationalStore.RdbPredicates('downloadinfo');
+      predicates.equalTo('downloadId', list[i].downloadId);
+      // FileUtil.writeTmpBytes(list[i].fileName as string);
+      await SqliteHelper.getInstance(this.context).update({
+        status: 0,
+      }, predicates)
 
+    }
   }
 }
-
