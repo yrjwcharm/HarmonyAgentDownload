@@ -115,44 +115,16 @@ export class DownloadManager {
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
     if (progress.sizes[0] > -1) {
-
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
       valuesBuket.begins = progress.processed + (valuesBuket.begins as number)
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
-
       DownloadManager.writeTmpBytes(valuesBuket.fileName as string);
 
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.PAUSE,
         valuesBuket.downloadId as string,
         downloadTask.tid)
-    }
-  }
-
-  public async resumeCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
-    downloadTask: request.agent.Task,
-    predicates: relationalStore.RdbPredicates,
-    callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
-    if (progress.sizes[0] > -1) {
-      try {
-        let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
-        request.agent.getTask(getContext(), list[0].taskId)
-        valuesBuket.fileSize = progress.sizes[0];
-        valuesBuket.downloadSize = progress.processed;
-        valuesBuket.begins = 0
-        let dstPath = getContext().cacheDir + "/tmp/" + valuesBuket.fileName;
-        fileIo.rmdirSync(dstPath);
-      } catch (e) {
-        valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
-        valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
-        valuesBuket.begins = progress.processed + (valuesBuket.begins as number)
-      } finally {
-        await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
-        callback(valuesBuket.downloadSize as number, valuesBuket.fileSize as number, DownloadStatus.RUNNING,
-          valuesBuket.downloadId as string,
-          downloadTask.tid)
-      }
     }
   }
 

@@ -2,7 +2,7 @@ import relationalStore from '@ohos.data.relationalStore';
 import { ValuesBucket } from '@ohos.data.ValuesBucket';
 import { DownloadInfo } from '../model/DownloadInfo';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from '../utils/Logger';
+import { Log } from '@abner/log';
 
 export default class SqliteHelper {
   private static instance: SqliteHelper
@@ -54,10 +54,7 @@ export default class SqliteHelper {
       SqliteHelper.rdbStore = await relationalStore.getRdbStore(this.context, STORE_CONFIG)
       await SqliteHelper.rdbStore?.executeSql(SQL_CREATE_TABLE)
     } catch (e) {
-      Logger.init({
-        tag: '数据库建表出错'
-      })
-      Logger.info(e);
+      Log.info("数据库建表异常", e.message);
     }
   }
 

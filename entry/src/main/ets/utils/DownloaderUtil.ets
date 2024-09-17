@@ -1,7 +1,7 @@
 import { request } from '@kit.BasicServicesKit';
 import { relationalStore, ValuesBucket } from '@kit.ArkData';
-import { Logger } from './Logger';
 import { DownloadManager } from '../downloadmanager/DownloadManager';
+import { Log } from '@abner/log';
 
 
 export interface IDownload {
@@ -23,7 +23,7 @@ export class DownloaderUtil {
       downloadTask.off('failed');
       await request.agent.remove(downloadTask.tid);
     } catch (err) {
-      Logger.info(`deleteTask fail, err= ${JSON.stringify(err)}`);
+      Log.info(`deleteTask fail, err= ${JSON.stringify(err)}`);
     }
   }
 
@@ -34,12 +34,8 @@ export class DownloaderUtil {
   }
 
   static async resume(taskId: string, callback?: (code: number) => void) {
-    try {
-      const taskObj = await request.agent.getTask(getContext(), taskId);
-      await taskObj.resume();
-    } catch (e) {
-      callback?.(e.code);
-    }
+    const taskObj = await request.agent.getTask(getContext(), taskId);
+    await taskObj.resume()
   }
 
   static async downloadFile(downloadList: IDownload[],
@@ -91,11 +87,6 @@ export class DownloaderUtil {
             .pausedCallback(valuesBuket, progress, downloadTask, predicates, callback);
 
         }
-        let resumeCallback = (progress: request.agent.Progress) => {
-          DownloadManager.getInstance()
-            .resumeCallback(valuesBuket, progress, downloadTask, predicates, callback);
-
-        }
         let failedCallback = (progress: request.agent.Progress) => {
           DownloadManager.getInstance()
             .failedCallback(valuesBuket, progress, downloadTask, predicates, callback);
@@ -104,11 +95,10 @@ export class DownloaderUtil {
         downloadTask.on('progress', progressCallback)
         downloadTask.on('completed', completedCallback);
         downloadTask.on('pause', pauseCallback);
-        downloadTask.on('resume', resumeCallback);
         downloadTask.on('failed', failedCallback)
         await downloadTask.start();
       } catch (err) {
-        Logger.error(`task  err, err  = ${JSON.stringify(err)}`);
+        Log.error(`task  err, err  = ${JSON.stringify(err)}`);
       }
     }
   }
