@@ -20,6 +20,9 @@
           ],
           "when": "inuse"
         }
+      },
+      {
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
       }
       ],
     "deliveryWithInstall": true,
@@ -34,6 +37,7 @@
         "label": "$string:EntryAbility_label",
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
+        "backgroundModes": ["dataTransfer"],
         "exported": true,
         "skills": [
           {

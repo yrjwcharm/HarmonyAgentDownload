@@ -2,7 +2,8 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
-import { PreferencesUtil } from '../utils/PreferencesUtil';
+import { relationalStore } from '@kit.ArkData';
+import { request } from '@kit.BasicServicesKit';
 
 
 export default class EntryAbility extends UIAbility {
@@ -12,10 +13,20 @@ export default class EntryAbility extends UIAbility {
   }
 
 
-  onDestroy() {
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
-    let applicationContext = this.context.getApplicationContext();
-    console.log(`stage applicationContext: ${applicationContext}`);
+  async onDestroy() {
+    let predicates = new relationalStore.RdbPredicates('downloadinfo');
+    predicates.equalTo('userID', '1');
+    predicates.equalTo('status', 2)
+    let list = await SqliteHelper.getInstance(this.context).queryData(predicates)
+    for (let i = 0; i < list.length; i++) {
+      let predicates = new relationalStore.RdbPredicates('downloadinfo');
+      await request.agent.remove(list[i].taskId);
+      predicates.equalTo('downloadId', list[i].downloadId)
+      await SqliteHelper.getInstance(this.context).update({
+        'status': 0
+      }, predicates)
+    }
+
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage) {
@@ -41,7 +52,7 @@ export default class EntryAbility extends UIAbility {
 
   }
 
-  onBackground(): void {
-    PreferencesUtil.putSync('isExitedApp', true);
+  async onBackground() {
+
   }
 }

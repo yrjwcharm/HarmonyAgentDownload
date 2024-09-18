@@ -41,13 +41,7 @@ struct MultiFileDownload {
   ]
 
   async aboutToAppear() {
-    // BackgroundTaskManager.getInstance(getContext()).requestSuspendDelay();
-    // BackgroundTaskManager.getInstance(getContext()).startContinuousTask();
     this.initData();
-    // getContext().eventHub.on('myEvent', (args: boolean) => {
-    //   this.initData();
-    // });
-
   }
 
   async initData() {

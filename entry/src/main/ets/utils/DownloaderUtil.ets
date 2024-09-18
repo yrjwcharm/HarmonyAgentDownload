@@ -46,7 +46,7 @@ export class DownloaderUtil {
         action: request.agent.Action.DOWNLOAD,
         url: item.url,
         title: item.title,
-        mode: request.agent.Mode.BACKGROUND,
+        mode: request.agent.Mode.FOREGROUND,
         retry: true,
         network: request.agent.Network.ANY,
         saveas: `./`,
@@ -57,7 +57,6 @@ export class DownloaderUtil {
       }
       try {
         let downloadTask = await request.agent.create(getContext(), downloadConfig);
-
         let fileName = item.url.substring(item.url.lastIndexOf('/') + 1);
         let valuesBuket: ValuesBucket = {
           'userID': '1',

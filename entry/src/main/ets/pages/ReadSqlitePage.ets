@@ -146,41 +146,15 @@ struct ReadSqlitePage {
                   DownloaderUtil.pause(item.taskId);
 
                 } else if (item.status === 0) {
-                  try {
-                    DownloaderUtil.downloadFile([{
-                      id: item.downloadId,
-                      url: item.url,
-                      // title:
-                      status: item.status,
-                      begins: item.begins ?? 0,
-                    }], (downloadSize, fileSize, status, i) => {
-                      getContext().eventHub.emit('myEvent', true);
 
-                    })
-                    // try {
-                    //   const taskObj = await request.agent.getTask(getContext(), item.taskId);
-                    //   if (taskObj.config.ends === -1) {
-                    //     DownloaderUtil.downloadFile([{
-                    //       id: item.downloadId,
-                    //       url: item.url,
-                    //       status: item.status,
-                    //       begins: item.begins ?? 0,
-                    //     }], (downloadSize, fileSize, status, id) => {
-                    //
-                    //     })
-                    //
-                    //     // });
-                    //   } else {
-                    //     await taskObj.resume()
-                    //
-                    //   }
-                    // } catch (e) {
-                    //
-                    // }
+                  DownloaderUtil.downloadFile([{
+                    id: item.downloadId,
+                    url: item.url,
+                    status: item.status,
+                    begins: item.begins ?? 0,
+                  }], (downloadSize, fileSize, status, id) => {
 
-                  } catch (e) {
-
-                  }
+                  })
 
                 }
 
