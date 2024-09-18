@@ -71,6 +71,7 @@ export class DownloadManager {
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
     if (progress.sizes[0] > -1) {
+
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number);
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number);
       valuesBuket.status = DownloadStatus.RUNNING;
@@ -78,7 +79,6 @@ export class DownloadManager {
       let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
       if (list.length > 0) {
         await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates);
-        // }
       } else {
         await SqliteHelper.getInstance(getContext()).insert('downloadinfo', valuesBuket);
       }
@@ -113,36 +113,17 @@ export class DownloadManager {
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
     if (progress.sizes[0] > -1) {
-
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
       valuesBuket.begins = progress.processed + (valuesBuket.begins as number);
+      DownloadManager.writeTmpBytes(valuesBuket.fileName as string)
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
-
-      DownloadManager.writeTmpBytes(valuesBuket.fileName as string);
-
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.PAUSE,
         valuesBuket.downloadId as string,
         downloadTask.tid)
     }
   }
-
-  // public async resumeCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
-  //   downloadTask: request.agent.Task,
-  //   predicates: relationalStore.RdbPredicates,
-  //   callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
-  //   if (progress.sizes[0] > -1) {
-  //     valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
-  //     valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
-  //     valuesBuket.status = DownloadStatus.PAUSE;
-  //     valuesBuket.begins = progress.processed;
-  //     await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
-  //     callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RESUME,
-  //       valuesBuket.downloadId as string,
-  //       downloadTask.tid)
-  //   }
-  // }
 
   public async failedCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,

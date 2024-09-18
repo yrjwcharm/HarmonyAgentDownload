@@ -2,6 +2,7 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
+import { PreferencesUtil } from '../utils/PreferencesUtil';
 
 
 export default class EntryAbility extends UIAbility {
@@ -37,5 +38,10 @@ export default class EntryAbility extends UIAbility {
   }
 
   onForeground() {
+
+  }
+
+  onBackground(): void {
+    PreferencesUtil.putSync('isExitedApp', true);
   }
 }

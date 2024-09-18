@@ -154,6 +154,7 @@ struct ReadSqlitePage {
                       status: item.status,
                       begins: item.begins ?? 0,
                     }], (downloadSize, fileSize, status, i) => {
+                      getContext().eventHub.emit('myEvent', true);
 
                     })
                     // try {
@@ -162,10 +163,9 @@ struct ReadSqlitePage {
                     //     DownloaderUtil.downloadFile([{
                     //       id: item.downloadId,
                     //       url: item.url,
-                    //       // title:
                     //       status: item.status,
                     //       begins: item.begins ?? 0,
-                    //     }], (downloadSize, fileSize, status, i) => {
+                    //     }], (downloadSize, fileSize, status, id) => {
                     //
                     //     })
                     //
