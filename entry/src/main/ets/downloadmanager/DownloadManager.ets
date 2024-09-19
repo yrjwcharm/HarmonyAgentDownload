@@ -121,7 +121,6 @@ export class DownloadManager {
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
-      valuesBuket.begins = progress.processed + (valuesBuket.begins as number);
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.PAUSE,
         valuesBuket.downloadId as string,
@@ -134,7 +133,8 @@ export class DownloadManager {
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,
   ) {
-    valuesBuket.downloadSize = progress.sizes[0] + (valuesBuket.begins as number);
+    valuesBuket.downloadSize = progress.processed
+      + (valuesBuket.begins as number);
     let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
     valuesBuket.fileSize = list[0].fileSize;
     valuesBuket.status = DownloadStatus.FAILED;
