@@ -72,11 +72,9 @@ export class DownloadManager {
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
     if (progress.sizes[0] > -1) {
-      console.log('进度更新1...', progress.processed, progress.sizes[0], valuesBuket.begins)
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number);
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number);
       valuesBuket.status = DownloadStatus.RUNNING;
-      console.log('进度更新2...', valuesBuket.downloadSize, valuesBuket.fileSize, valuesBuket.begins)
       //判断当前下载任务是否已经在数据库中
       let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
       try {
@@ -124,7 +122,6 @@ export class DownloadManager {
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
       valuesBuket.begins = progress.processed + (valuesBuket.begins as number);
-      DownloadManager.writeTmpBytes(getContext(), valuesBuket.fileName as string)
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.PAUSE,
         valuesBuket.downloadId as string,
