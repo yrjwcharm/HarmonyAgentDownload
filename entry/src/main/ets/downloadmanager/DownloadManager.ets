@@ -37,9 +37,9 @@ export class DownloadManager {
   }
 
   //下载完成后删除临时文件
-  public static deleteTmpFile(fileName: string) {
-    let srcPath = getContext().cacheDir + "/" + fileName;
-    let dstPath = getContext().cacheDir + "/tmp/" + fileName;
+  public static deleteTmpFile(context: Context, fileName: string) {
+    let srcPath = context.cacheDir + "/" + fileName;
+    let dstPath = context.cacheDir + "/tmp/" + fileName;
     if (fileIo.accessSync(dstPath)) {
       DownloadManager.readFileBytes(srcPath, dstPath);
       fileIo.copyFileSync(dstPath, srcPath);
@@ -48,10 +48,10 @@ export class DownloadManager {
   }
 
   //把下载的视频字节数存储到临时文件夹下面
-  public static writeTmpBytes(fileName: string) {
+  public static writeTmpBytes(context: Context, fileName: string) {
     try {
-      let srcPath = getContext().cacheDir + "/" + fileName;
-      let dstPath = getContext().cacheDir + "/tmp";
+      let srcPath = context.cacheDir + "/" + fileName;
+      let dstPath = context.cacheDir + "/tmp";
       if (!fileIo.accessSync(dstPath)) {
         fileIo.mkdirSync(dstPath);
       }
@@ -71,10 +71,11 @@ export class DownloadManager {
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
     if (progress.sizes[0] > -1) {
-
+      console.log('进度更新1...', progress.processed, progress.sizes[0], valuesBuket.begins)
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number);
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number);
       valuesBuket.status = DownloadStatus.RUNNING;
+      console.log('进度更新2...', valuesBuket.downloadSize, valuesBuket.fileSize, valuesBuket.begins)
       //判断当前下载任务是否已经在数据库中
       let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
       try {
@@ -106,7 +107,7 @@ export class DownloadManager {
       promptAction.showToast({
         message: '下载完毕'
       })
-      DownloadManager.deleteTmpFile(valuesBuket.fileName as string);
+      DownloadManager.deleteTmpFile(getContext(),valuesBuket.fileName as string);
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.COMPLETED,
         valuesBuket.downloadId as string,
         downloadTask.tid)
@@ -122,7 +123,7 @@ export class DownloadManager {
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
       valuesBuket.begins = progress.processed + (valuesBuket.begins as number);
-      DownloadManager.writeTmpBytes(valuesBuket.fileName as string)
+      DownloadManager.writeTmpBytes(getContext(),valuesBuket.fileName as string)
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.PAUSE,
         valuesBuket.downloadId as string,

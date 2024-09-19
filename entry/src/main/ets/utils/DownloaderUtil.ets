@@ -71,9 +71,6 @@ export class DownloaderUtil {
         let predicates = new relationalStore.RdbPredicates('downloadinfo');
         predicates.equalTo('downloadId', item.id);
         let progressCallback = (progress: request.agent.Progress) => {
-
-          console.log('进度更新...', progress.processed, progress.sizes[0], item.begins)
-
           DownloadManager.getInstance()
             .progressCallback(valuesBuket, progress, downloadTask, predicates, callback);
         }

@@ -4,6 +4,7 @@ import { window } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
 import { relationalStore } from '@kit.ArkData';
 import { request } from '@kit.BasicServicesKit';
+import { DownloadManager } from '../downloadmanager/DownloadManager';
 
 
 export default class EntryAbility extends UIAbility {
@@ -21,9 +22,12 @@ export default class EntryAbility extends UIAbility {
     for (let i = 0; i < list.length; i++) {
       let predicates = new relationalStore.RdbPredicates('downloadinfo');
       await request.agent.remove(list[i].taskId);
+      // 进度更新... 2521665 15268894 0
+      DownloadManager.writeTmpBytes(list[0].fileName);
       predicates.equalTo('downloadId', list[i].downloadId)
       await SqliteHelper.getInstance(this.context).update({
-        'status': 0
+        'status': 0,
+        begins: list[i].downloadSize,
       }, predicates)
     }
 

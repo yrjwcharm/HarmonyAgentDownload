@@ -91,12 +91,11 @@ export default class SqliteHelper {
 
   public update(data: ValuesBucket, predicates: relationalStore.RdbPredicates): Promise<number> {
     return new Promise((resolve, reject) => {
-      console.log('333', JSON.stringify(data), JSON.stringify(predicates))
       SqliteHelper.rdbStore?.update(data, predicates).then(number => {
         resolve(number);
       }).catch((err: BusinessError) => {
         reject(err);
-        console.log('异常', err.message)
+        console.log('异常日志', err.message)
       })
     })
   }
