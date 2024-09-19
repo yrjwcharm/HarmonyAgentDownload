@@ -77,11 +77,16 @@ export class DownloadManager {
       valuesBuket.status = DownloadStatus.RUNNING;
       //判断当前下载任务是否已经在数据库中
       let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
-      if (list.length > 0) {
-        await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates);
-      } else {
-        await SqliteHelper.getInstance(getContext()).insert('downloadinfo', valuesBuket);
+      try {
+        if (list.length > 0) {
+          await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates);
+        } else {
+          await SqliteHelper.getInstance(getContext()).insert('downloadinfo', valuesBuket);
+        }
+      } catch (e) {
+        console.log(e.message)
       }
+
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RUNNING,
         valuesBuket.downloadId as string,
         downloadTask.tid)
