@@ -17,7 +17,7 @@ export class DownloadManager {
   }
 
   //视频文件下载读取字节数据、然后给目标临时文件tmp写入数据
-  public static readFileBytes(srcPath: string, dstPath: string) {
+  public static readFileBytes(srcPath: string, dstPath: string, callback?: (bytes: number) => void) {
     if (fileIo.accessSync(srcPath)) {
       //读取数据
       let file = fileIo.openSync(srcPath, fileIo.OpenMode.READ_WRITE);
@@ -31,6 +31,7 @@ export class DownloadManager {
         let writeLen = fileIo.writeSync(file0.fd, buf);
         console.info("write data to file succeed and size is:" + writeLen);
         fileIo.closeSync(file0);
+        callback && callback(writeLen);
       } catch (e) {
       }
     }
@@ -48,7 +49,7 @@ export class DownloadManager {
   }
 
   //把下载的视频字节数存储到临时文件夹下面
-  public static writeTmpBytes(context: Context, fileName: string) {
+  public static writeTmpBytes(context: Context, fileName: string, callback?: (bytes: number) => void) {
     try {
       let srcPath = context.cacheDir + "/" + fileName;
       let dstPath = context.cacheDir + "/tmp";
@@ -60,7 +61,7 @@ export class DownloadManager {
       dstPath = dstPath + '/' + fileName
       let stream = fileIo.createStreamSync(dstPath, "a+");
       stream.closeSync();
-      DownloadManager.readFileBytes(srcPath, dstPath);
+      DownloadManager.readFileBytes(srcPath, dstPath, callback);
     } catch (e) {
       console.log('异常信息', e);
     }
@@ -107,7 +108,7 @@ export class DownloadManager {
       promptAction.showToast({
         message: '下载完毕'
       })
-      DownloadManager.deleteTmpFile(getContext(),valuesBuket.fileName as string);
+      DownloadManager.deleteTmpFile(getContext(), valuesBuket.fileName as string);
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.COMPLETED,
         valuesBuket.downloadId as string,
         downloadTask.tid)
@@ -123,7 +124,7 @@ export class DownloadManager {
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
       valuesBuket.begins = progress.processed + (valuesBuket.begins as number);
-      DownloadManager.writeTmpBytes(getContext(),valuesBuket.fileName as string)
+      DownloadManager.writeTmpBytes(getContext(), valuesBuket.fileName as string)
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.PAUSE,
         valuesBuket.downloadId as string,

@@ -23,12 +23,14 @@ export default class EntryAbility extends UIAbility {
       let predicates = new relationalStore.RdbPredicates('downloadinfo');
       await request.agent.remove(list[i].taskId);
       // 进度更新... 2521665 15268894 0
-      DownloadManager.writeTmpBytes(list[0].fileName);
-      predicates.equalTo('downloadId', list[i].downloadId)
-      await SqliteHelper.getInstance(this.context).update({
-        'status': 0,
-        begins: list[i].downloadSize,
-      }, predicates)
+      DownloadManager.writeTmpBytes(this.context, list[0].fileName, async bytes => {
+        predicates.equalTo('downloadId', list[i].downloadId)
+        await SqliteHelper.getInstance(this.context).update({
+          'status': 0,
+          downloadSize: bytes,
+          begins: bytes,
+        }, predicates)
+      });
     }
 
   }
