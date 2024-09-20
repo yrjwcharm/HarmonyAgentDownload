@@ -158,7 +158,7 @@ struct ReadSqlitePage {
                         status: item.status,
                         begins: item.begins ?? 0,
                       }], (downloadSize, fileSize, status, i) => {
-
+                        getContext().eventHub.emit('trigger', true);
                       })
                     } else {
                       await taskObj.resume()
