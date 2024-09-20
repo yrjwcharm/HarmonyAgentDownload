@@ -30,8 +30,8 @@ export class DownloadManager {
           fileIo.openSync(dstPath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.APPEND);
         let writeLen = fileIo.writeSync(file0.fd, buf);
         console.info("write data to file succeed and size is:" + writeLen);
-        fileIo.closeSync(file0);
         callback && callback(writeLen);
+        fileIo.closeSync(file0);
       } catch (e) {
       }
     }
@@ -75,6 +75,7 @@ export class DownloadManager {
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number);
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number);
       valuesBuket.status = DownloadStatus.RUNNING;
+      console.log('进度更新...', valuesBuket.downloadSize, valuesBuket.fileSize, valuesBuket.begins)
       //判断当前下载任务是否已经在数据库中
       let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
       try {

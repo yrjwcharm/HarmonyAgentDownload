@@ -67,8 +67,7 @@ export default class EntryAbility extends UIAbility {
       DownloadManager.writeTmpBytes(this.context, list[i].fileName, async bytes => {
         await SqliteHelper.getInstance(this.context).update({
           'status': 0,
-          downloadSize: bytes,
-          begins: bytes
+          begins: bytes,
         }, predicates)
       })
 
