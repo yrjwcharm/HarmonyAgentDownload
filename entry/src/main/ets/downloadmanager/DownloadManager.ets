@@ -19,7 +19,13 @@ export class DownloadManager {
   }
 
   //退出App暂停
-  public static async exitApp(context: Context, moduleType: number) {
+  public static async exitAppPause(context: Context) {
+    DownloadManager.pauseAllCacheCourse(context, 1);
+    DownloadManager.pauseAllCacheCourse(context, 2);
+  }
+
+  //暂停所有缓存课程
+  public static async pauseAllCacheCourse(context: Context, moduleType: number) {
     let predicates = new relationalStore.RdbPredicates(moduleType === 1 ? 'cachecourse' : 'studymaterial');
     predicates.equalTo('status', 2).or()
     predicates.equalTo('status', 0)
@@ -35,9 +41,9 @@ export class DownloadManager {
           begins: bytes,
         }, predicates)
       })
-
     }
   }
+
 
   public static getPackage(fileName: string, item: API_COMMON_INTERFACE.IPackage) {
     let imPackageUrl = '', videoPackageUrl = '', playbackImg = '';
