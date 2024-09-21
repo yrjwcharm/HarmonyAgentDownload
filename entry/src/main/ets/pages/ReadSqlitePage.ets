@@ -23,7 +23,7 @@ struct ReadSqlitePage {
     let predicates = new relationalStore.RdbPredicates('studymaterial');
     predicates.equalTo('userId', '1');
     let list = await SqliteHelper.getInstance(getContext()).queryStudyMaterialData(predicates);
-    console.log('数据结构', list[0].url, list[0].fileName, list[0].filePath)
+    console.log('数据结构', list[0].url, list[0].filePath + '/' + list[0].fileName)
   }
 
   aboutToDisappear(): void {
