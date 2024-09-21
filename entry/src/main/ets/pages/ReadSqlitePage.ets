@@ -4,6 +4,8 @@ import { API_COMMON_INTERFACE } from '../interface/ICommon';
 import { CacheCourse } from '../model/CacheCourse';
 import { fileIo } from '@kit.CoreFileKit';
 import { List } from '@kit.ArkTS';
+import { DownloaderUtil } from '../utils/DownloaderUtil';
+import { request } from '@kit.BasicServicesKit';
 
 @Entry
 @Component
@@ -20,7 +22,59 @@ struct ReadSqlitePage {
 
   }
 
-  //查询课程
+  //下载接口
+  downloadFile(data: API_COMMON_INTERFACE.ICacheCourse | API_COMMON_INTERFACE.IStudyMaterial,
+    moduleType: number): Promise<API_COMMON_INTERFACE.IDownloadFileCallback> {
+    return new Promise((resolve, reject) => {
+      DownloaderUtil.downloadFile(data, moduleType,
+        (downloadSize: number, fileSize: number, status: number, downloadId: string) => {
+          resolve({
+            downloadSize,
+            fileSize,
+            status,
+            downloadId
+          } as API_COMMON_INTERFACE.IDownloadFileCallback)
+        });
+    })
+  }
+
+  //暂停下载
+  async pauseDownload(userId: string, downloadId: string, moduleType: number): Promise<void> {
+    let predicates = new relationalStore.RdbPredicates(moduleType === 1 ? 'cachecourse' : 'studymaterial');
+    predicates.equalTo('userId', userId);
+    predicates.equalTo('downloadId', downloadId);
+    let list = await SqliteHelper.getInstance(getContext()).queryData(predicates, moduleType);
+    let taskInfo = await request.agent.getTask(getContext(), list[0].taskId);
+    return taskInfo.pause();
+  }
+
+  //恢复下载
+  async resumeDownload(userId: string, downloadId: string,
+    moduleType: number,
+    data: API_COMMON_INTERFACE.ICacheCourse | API_COMMON_INTERFACE.IStudyMaterial): Promise<API_COMMON_INTERFACE.IDownloadFileCallback | void> {
+    let predicates = new relationalStore.RdbPredicates(moduleType === 1 ? 'cachecourse' : 'studymaterial');
+    predicates.equalTo('userId', userId);
+    predicates.equalTo('downloadId', downloadId);
+    let list = await SqliteHelper.getInstance(getContext()).queryData(predicates, moduleType);
+    let taskInfo = await request.agent.getTask(getContext(), list[0].taskId);
+    if (taskInfo.config.ends === -1) {
+      return new Promise((resolve, reject) => {
+        DownloaderUtil.downloadFile(data, moduleType,
+          (downloadSize: number, fileSize: number, status: number, downloadId: string) => {
+            resolve({
+              downloadSize,
+              fileSize,
+              status,
+              downloadId
+            } as API_COMMON_INTERFACE.IDownloadFileCallback)
+          });
+      })
+    } else {
+      return taskInfo.pause();
+    }
+  }
+
+  //查询课程 父节点
   queryCacheCourseList(userId: string): Promise<API_COMMON_INTERFACE.ICacheCourse[]> {
     let predicates = new relationalStore.RdbPredicates('cachecourse');
     predicates.equalTo('userId', userId);

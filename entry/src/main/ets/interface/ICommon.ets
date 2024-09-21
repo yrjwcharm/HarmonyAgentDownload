@@ -77,4 +77,12 @@ export declare namespace API_COMMON_INTERFACE {
   interface IMergedData {
     fid: IFidPackage
   }
+
+  interface IDownloadFileCallback {
+    downloadSize: number,
+    fileSize: number,
+    status: number,
+    downloadId: string,
+    taskId?: string
+  }
 }
