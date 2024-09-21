@@ -236,7 +236,6 @@ export default class SqliteHelper {
               url, fid, filePath, fileName, fileSize, downloadSize, status, downloadId, begins)
           list.push(studyMaterial);
         }
-        console.log('333', list)
         resolve(list);
         resultSet?.close()
         // 释放数据集的内存
