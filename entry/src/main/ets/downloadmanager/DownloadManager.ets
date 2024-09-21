@@ -26,7 +26,7 @@ export class DownloadManager {
       let predicates = new relationalStore.RdbPredicates(moduleType === 1 ? 'cachecourse' : 'studymaterial');
       await request.agent.remove(list[i].taskId);
       predicates.equalTo('downloadId', list[i].downloadId)
-      FileUtil.writeTmpBytes(context, list[i].fileName, async bytes => {
+      FileUtil.writeTmpBytes(context, list[i].downloadId + '/' + list[i].fileName, async bytes => {
         await SqliteHelper.getInstance(context).update({
           'status': 0,
           begins: bytes,
@@ -159,7 +159,7 @@ export class DownloadManager {
       valuesBuket.status = DownloadStatus.COMPLETED;
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
       DownloaderUtil.deleteTask(downloadTask);
-      FileUtil.deleteTmpFile(getContext(), valuesBuket.fileName as string);
+      FileUtil.deleteTmpFile(getContext(), valuesBuket.downloadId + '/' + valuesBuket.fileName as string);
       if (moduleType === 1) {
         if (maxObj?.url === item.url) {
           promptAction.showToast({

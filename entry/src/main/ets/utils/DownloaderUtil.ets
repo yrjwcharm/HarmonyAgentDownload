@@ -54,13 +54,18 @@ export class DownloaderUtil {
     }
     for (let i = 0; i < downloadList.length; i++) {
       let item = downloadList[i];
+      let downloadId = moduleType === 1 ? (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber :
+      (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber
+      let fileName = item.url.substring(item.url.lastIndexOf('/') + 1);
+      let savePath =
+        getContext().cacheDir + '/' + downloadId + '/' + fileName
       let downloadConfig: request.agent.Config = {
         action: request.agent.Action.DOWNLOAD,
         url: item.url,
         mode: request.agent.Mode.FOREGROUND,
         retry: true,
         network: request.agent.Network.ANY,
-        saveas: `./`,
+        saveas: savePath,
         overwrite: true,
         gauge: true,
         priority: 0,
@@ -68,15 +73,12 @@ export class DownloaderUtil {
       }
       try {
         let downloadTask = await request.agent.create(getContext(), downloadConfig);
-        let downloadId = moduleType === 1 ? (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber :
-        (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber
-        let fileName = item.url.substring(item.url.lastIndexOf('/') + 1);
         let valuesBuket: ValuesBucket = {
           'userId': data.userId,
           'taskId': downloadTask.tid, //必传
           'downloadId': downloadId, //必传
           'url': item.url, //必传
-          'filePath': getContext().cacheDir,
+          'filePath': getContext().cacheDir + '/' + downloadId,
           'fileName': fileName,
           "begins": data.begins ?? 0
         }
