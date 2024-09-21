@@ -57,7 +57,6 @@ export class DownloaderUtil {
       let maxSize = Math.max(...downloadList.filter(item => item.size).map(item => parseInt(item.size as string)));
       maxObj = downloadList.find(item => parseInt(item.size as string) === maxSize);
     }
-
     for (let i = 0; i < downloadList.length; i++) {
       let item = downloadList[i];
       let downloadConfig: request.agent.Config = {
@@ -87,6 +86,22 @@ export class DownloaderUtil {
         }
         let predicates: relationalStore.RdbPredicates | undefined = undefined;
         if (moduleType == 1) { //缓存课程
+          let dataSource = data as API_COMMON_INTERFACE.ICacheCourse;
+          valuesBuket.playbackList = JSON.stringify(dataSource.playbackList);
+          valuesBuket.bigRoomId = dataSource.bigRoomId;
+          valuesBuket.subRoomId = dataSource.subRoomId;
+          valuesBuket.version = dataSource.version;
+          valuesBuket.subClazzNumber = dataSource.subClazzNumber;
+          valuesBuket.property = dataSource.property;
+          valuesBuket.roomType = dataSource.roomType;
+          valuesBuket.layoutType = dataSource.layoutType;
+          valuesBuket.layoutTypeV2 = dataSource.layoutTypeV2;
+          valuesBuket.flexiblySwitchGreyFlag = dataSource.flexiblySwitchGreyFlag;
+          valuesBuket.clazzLessonNumber = dataSource.clazzLessonNumber;
+          valuesBuket.clazzLessonName = dataSource.clazzLessonName;
+          valuesBuket.clazzLessonTagDesc = dataSource.clazzLessonTagDesc;
+          valuesBuket.clazzNumber = dataSource.clazzNumber;
+          valuesBuket.clazzName = dataSource.clazzName;
           predicates = new relationalStore.RdbPredicates('cachecourse');
           predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber)
         } else {
@@ -95,18 +110,15 @@ export class DownloaderUtil {
           predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber)
         }
         let progressCallback = (progress: request.agent.Progress) => {
-
-          console.log('进度更新...', progress.processed, progress.sizes[0])
-
           DownloadManager.getInstance()
             .progressCallback(moduleType, valuesBuket, progress, downloadTask,
-              predicates as relationalStore.RdbPredicates,
-              callback, item);
+              predicates as relationalStore.RdbPredicates, item, maxObj,
+              callback);
         }
         let completedCallback = (progress: request.agent.Progress) => {
           DownloadManager.getInstance()
             .completedCallback(moduleType, valuesBuket, progress, downloadTask,
-              predicates as relationalStore.RdbPredicates,
+              predicates as relationalStore.RdbPredicates, item, maxObj,
               callback);
         };
         let pauseCallback = (progress: request.agent.Progress) => {

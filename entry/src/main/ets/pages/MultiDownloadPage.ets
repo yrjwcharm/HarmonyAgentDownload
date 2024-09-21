@@ -14,7 +14,8 @@ struct MultiFileDownload {
       },
       "videoPackage": {
         "size": "31648774",
-        "url": "http://dtx-video.wenzaizhibo.com/84ef28687d5bdca76eab4c0efbe251c7/66ed7bf6/00-x-upload/video/205840692_4c4e46d043eac57b6be22ba5e9335c55_bgYzATsO_mp4/205840692_4c4e46d043eac57b6be22ba5e9335c55_bgYzATsO_f.wz1"
+        "url": 'https://vd2.bdstatic.com/mda-pkkf9qb7zksdaqs9/576p/h264/1700564765354260319/mda-pkkf9qb7zksdaqs9.mp4',
+
       },
       "roomId": "62091504722899810",
       "sessionId": 1,
@@ -28,8 +29,8 @@ struct MultiFileDownload {
         "url": "https://d.wenzaizhibo.com/video-signal/283434793034a2dba4e51da34ca2dfa9/group/40104303/40104303.tar.gz?OSSAccessKeyId\u003dLTAI4G97E1JngXNN8WxsY4FN\u0026Expires\u003d1726839798\u0026Signature\u003d0KZQ%2BRW80tbD%2Faku27FEfO49%2Bp0%3D"
       },
       "videoPackage": {
-        "size": "270549967",
-        "url": "http://dtx-video.wenzaizhibo.com/32ed2ce150acfe18de83faaaa658f052/66ed7bf6/00-x-upload/video/205840151_2b392743e048075be8176a3fb4919b51_98OW3z8r_mp4/205840151_2b392743e048075be8176a3fb4919b51_98OW3z8r_f.wz1"
+        "size": "20549967",
+        "url": 'https://vd4.bdstatic.com/mda-pku9q3zt0rzybip0/hd/cae_h264/1701381974031001593/mda-pku9q3zt0rzybip0.mp4',
       },
       "roomId": "6209080866069850",
       "sessionId": 0,
@@ -85,7 +86,7 @@ struct MultiFileDownload {
     Column() {
       Button('下载').onClick((event: ClickEvent) => {
         DownloaderUtil.downloadFile(this.dataSource, 1, (downloadSize, fileSize, status, id, taskId) => {
-
+          console.log('进度更新值计算', Math.trunc(downloadSize * 100 / fileSize) + '%')
         });
       })
       // List({ space: 12 }) {

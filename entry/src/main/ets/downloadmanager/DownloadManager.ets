@@ -6,6 +6,7 @@ import { promptAction } from '@kit.ArkUI';
 import { fileIo } from '@kit.CoreFileKit';
 import { DownloaderUtil } from '../utils/DownloaderUtil';
 import { API_COMMON_INTERFACE } from '../interface/ICommon';
+import { JSON } from '@kit.ArkTS';
 
 export class DownloadManager {
   private static instance: DownloadManager;
@@ -20,11 +21,11 @@ export class DownloadManager {
   public static getPackage(fileName: string, item: API_COMMON_INTERFACE.IPackage) {
     let imPackageUrl = '', videoPackageUrl = '', playbackImg = '';
     if (fileName.indexOf('.jpg') != -1) {
-      playbackImg = item.url;
+      playbackImg = fileName;
     } else if (fileName.indexOf('.wz1"') != -1) {
-      videoPackageUrl = item.url
+      videoPackageUrl = fileName
     } else {
-      imPackageUrl = item.url
+      imPackageUrl = fileName
     }
     let package_1: API_COMMON_INTERFACE.IPackage_1 = {
       fid: item.fid as string,
@@ -89,27 +90,30 @@ export class DownloadManager {
   public async progressCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
+    item: API_COMMON_INTERFACE.IPackage,
+    maxObj: API_COMMON_INTERFACE.IPackage | undefined = undefined,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,
-    item: API_COMMON_INTERFACE.IPackage) {
+  ) {
     if (progress.sizes[0] > -1) {
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number);
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number);
       valuesBuket.status = DownloadStatus.RUNNING;
-      console.log('进度更新...', valuesBuket.downloadSize, valuesBuket.fileSize, valuesBuket.begins)
       //判断当前下载任务是否已经在数据库中
       let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
       try {
         if (list.length > 0) {
           if (moduleType === 1) {
             let package_1 = DownloadManager.getPackage(valuesBuket.fileName as string, item);
-            let firstPackage: API_COMMON_INTERFACE.IPackage_1[] = JSON.parse(list[0].playbackUrl)
+            let firstPackage: API_COMMON_INTERFACE.IPackage_1[] =
+              JSON.parse(list[0].playbackUrl) as API_COMMON_INTERFACE.IPackage_1[]
             let urls: API_COMMON_INTERFACE.IPackage_1[] = [...firstPackage, package_1]
             let setArr = new Set(urls.map((item) => JSON.stringify(item)));
             let uniquePlayBackUrl: string[] = [];
             setArr.forEach(item => {
               uniquePlayBackUrl.push(item);
             })
-            console.log('测试', uniquePlayBackUrl);
+            let newUniqueArr = uniquePlayBackUrl.map(item => JSON.parse(item))
+            valuesBuket.playBackUrl = JSON.stringify(newUniqueArr);
           }
           await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates);
         } else {
@@ -123,16 +127,26 @@ export class DownloadManager {
       } catch (e) {
         console.log(e.message)
       }
-
-      callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RUNNING,
-        valuesBuket.downloadId as string,
-        downloadTask.tid)
+      if (moduleType === 1) {
+        //缓存课程 以最大下载字节数 走进度
+        if (item.url === maxObj?.url) {
+          callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RUNNING,
+            valuesBuket.downloadId as string,
+            downloadTask.tid)
+        }
+      } else {
+        callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RUNNING,
+          valuesBuket.downloadId as string,
+          downloadTask.tid)
+      }
     }
   }
 
   public async completedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
+    item: API_COMMON_INTERFACE.IPackage,
+    maxObj: API_COMMON_INTERFACE.IPackage | undefined = undefined,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
     if (progress.sizes[0] > -1) {
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
@@ -140,13 +154,18 @@ export class DownloadManager {
       valuesBuket.status = DownloadStatus.COMPLETED;
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
       DownloaderUtil.deleteTask(downloadTask);
-      promptAction.showToast({
-        message: '下载完毕'
-      })
       DownloadManager.deleteTmpFile(getContext(), valuesBuket.fileName as string);
-      callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.COMPLETED,
-        valuesBuket.downloadId as string,
-        downloadTask.tid)
+      if (moduleType === 1) {
+        if (maxObj?.url === item.url) {
+          callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.COMPLETED,
+            valuesBuket.downloadId as string,
+            downloadTask.tid)
+        }
+      } else {
+        callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.COMPLETED,
+          valuesBuket.downloadId as string,
+          downloadTask.tid)
+      }
     }
   }
 

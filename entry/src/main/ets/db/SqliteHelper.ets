@@ -122,10 +122,10 @@ export default class SqliteHelper {
     return new Promise(async (resolve, reject) => {
       SqliteHelper.rdbStore?.query(predicates,
         ['userId', 'playbackList', 'bigRoomId', 'subRoomId', 'version', 'subClazzNumber', 'property', 'roomType',
-          'layoutType',
-          'layoutTypeV2', 'flexiblySwitchGreyFlag', 'clazzLessonNumber', 'clazzLessonName', 'clazzLessonTagDesc',
-          'clazzNumber', 'clazzName',
-          'taskId', 'url', 'filePath', 'fileName', 'playBackUrl', 'downloadSize', 'fileSize', 'status', 'downloadId',
+          'layoutType', 'layoutTypeV2', 'flexiblySwitchGreyFlag', 'clazzLessonNumber', 'clazzLessonName',
+          'clazzLessonTagDesc',
+          'clazzNumber', 'clazzName', 'taskId', 'url', 'filePath', 'fileName', 'playBackUrl', 'downloadSize',
+          'fileSize', 'status', 'downloadId',
           'begins']).then(resultSet => {
         while (resultSet?.goToNextRow()) {
           const userId = resultSet.getString(resultSet.getColumnIndex('userId'));
@@ -148,7 +148,7 @@ export default class SqliteHelper {
           const url = resultSet.getString(resultSet.getColumnIndex('url'));
           const filePath = resultSet.getString(resultSet.getColumnIndex('filePath'));
           const fileName = resultSet.getString(resultSet.getColumnIndex('fileName'));
-          const playBackUrl = resultSet.getString(resultSet.getColumnIndex('fileName'));
+          const playBackUrl = resultSet.getString(resultSet.getColumnIndex('playBackUrl'));
           const fileSize = resultSet.getLong(resultSet.getColumnIndex('fileSize'));
           const downLoadSize = resultSet.getLong(resultSet.getColumnIndex('downLoadSize'));
           const status = resultSet.getLong(resultSet.getColumnIndex('status'))
