@@ -5,6 +5,7 @@ import { DownloadStatus } from '../constants/DownloadStatus';
 import { promptAction } from '@kit.ArkUI';
 import { fileIo } from '@kit.CoreFileKit';
 import { DownloaderUtil } from '../utils/DownloaderUtil';
+import { API_COMMON_INTERFACE } from '../interface/ICommon';
 
 export class DownloadManager {
   private static instance: DownloadManager;
@@ -14,6 +15,24 @@ export class DownloadManager {
       DownloadManager.instance = new DownloadManager();
     }
     return DownloadManager.instance;
+  }
+
+  public static getPackage(fileName: string, item: API_COMMON_INTERFACE.IPackage) {
+    let imPackageUrl = '', videoPackageUrl = '', playbackImg = '';
+    if (fileName.indexOf('.jpg') != -1) {
+      playbackImg = item.url;
+    } else if (fileName.indexOf('.wz1"') != -1) {
+      videoPackageUrl = item.url
+    } else {
+      imPackageUrl = item.url
+    }
+    let package_1: API_COMMON_INTERFACE.IPackage_1 = {
+      fid: item.fid as string,
+      imPackageUrl,
+      videoPackageUrl,
+      playbackImg,
+    }
+    return package_1;
   }
 
   //视频文件下载读取字节数据、然后给目标临时文件tmp写入数据
@@ -67,10 +86,11 @@ export class DownloadManager {
     }
   }
 
-  public async progressCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public async progressCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
-    callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
+    callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,
+    item: API_COMMON_INTERFACE.IPackage) {
     if (progress.sizes[0] > -1) {
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number);
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number);
@@ -80,9 +100,25 @@ export class DownloadManager {
       let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
       try {
         if (list.length > 0) {
+          if (moduleType === 1) {
+            let package_1 = DownloadManager.getPackage(valuesBuket.fileName as string, item);
+            let firstPackage: API_COMMON_INTERFACE.IPackage_1[] = JSON.parse(list[0].playbackUrl)
+            let urls: API_COMMON_INTERFACE.IPackage_1[] = [...firstPackage, package_1]
+            let setArr = new Set(urls.map((item) => JSON.stringify(item)));
+            let uniquePlayBackUrl: string[] = [];
+            setArr.forEach(item => {
+              uniquePlayBackUrl.push(item);
+            })
+            console.log('测试', uniquePlayBackUrl);
+          }
           await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates);
         } else {
-          await SqliteHelper.getInstance(getContext()).insert('downloadinfo', valuesBuket);
+          if (moduleType === 1) {
+            let package_1 = DownloadManager.getPackage(valuesBuket.fileName as string, item);
+            valuesBuket.playBackUrl = JSON.stringify([package_1]);
+          }
+          await SqliteHelper.getInstance(getContext())
+            .insert(moduleType === 1 ? 'cachecourse' : 'studymaterial', valuesBuket);
         }
       } catch (e) {
         console.log(e.message)
@@ -94,7 +130,7 @@ export class DownloadManager {
     }
   }
 
-  public async completedCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public async completedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
@@ -114,7 +150,7 @@ export class DownloadManager {
     }
   }
 
-  public async pausedCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public async pausedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
@@ -130,7 +166,7 @@ export class DownloadManager {
     }
   }
 
-  public async failedCallback(valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public async failedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,

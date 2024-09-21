@@ -1,6 +1,6 @@
 import SqliteHelper from '../db/SqliteHelper';
 import { relationalStore } from '@kit.ArkData';
-import { DownloadInfo } from '../model/DownloadInfo';
+import { CacheCourse } from '../model/CacheCourse';
 import { DownloaderUtil } from '../utils/DownloaderUtil';
 import { request } from '@kit.BasicServicesKit';
 
@@ -11,8 +11,8 @@ struct ReadSqlitePage {
   @State selectedFontColor: string = 'red'
   @State currentIndex: number = 0
   timer = 0;
-  @State downloadedList: Array<DownloadInfo> = [];
-  @State downloadingList: Array<DownloadInfo> = [];
+  @State downloadedList: Array<CacheCourse> = [];
+  @State downloadingList: Array<CacheCourse> = [];
   private controller: TabsController = new TabsController()
 
   async aboutToAppear() {
@@ -53,126 +53,126 @@ struct ReadSqlitePage {
     Tabs({ barPosition: BarPosition.Start, index: this.currentIndex, controller: this.controller }) {
       TabContent() {
         Column() {
-          List({ space: 12 }) {
-            ForEach(this.downloadedList, ((item: DownloadInfo) => {
-              ListItem() {
-                Row() {
-                  Text(item.url.substring(item.url.lastIndexOf('/') + 1)).maxLines(2)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis }).layoutWeight(1)
-                  Stack({ alignContent: Alignment.Start }) {
-                    Row() {
-                    }.width(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
-                    .backgroundColor(Color.Red)
-                    .height('100%')
-                    .borderRadius(6)
-
-                    Text(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
-                      .fontColor(Color.White).width('100%')
-                      .textAlign(TextAlign.Center)
-                      .fontSize(10)
-                  }
-                  .backgroundColor(Color.Gray)
-                  .height(10)
-                  .layoutWeight(1)
-                  .borderRadius(6)
-
-                  Text((+item.status === 3 ? '已暂停' : +item.status === 1 ? '已完成' :
-                    +item.status === 2 ? '下载中' : item.status === 1 ? '下载失败' : '待下载'))
-                    .maxLines(2)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .layoutWeight(1)
-                    .textAlign(TextAlign.End)
-                    .fontColor(Color.Red)
-                    .margin({
-                      left: 16
-                    })
-                }.width('100%')
-                .height(48)
-                .backgroundColor(Color.White)
-                .padding({
-                  left: 16,
-                  right: 16
-                })
-              }
-            }))
-          }
+          // List({ space: 12 }) {
+          //   ForEach(this.downloadedList, ((item: CacheCourse) => {
+          //     ListItem() {
+          //       Row() {
+          //         Text(item.url.substring(item.url.lastIndexOf('/') + 1)).maxLines(2)
+          //           .textOverflow({ overflow: TextOverflow.Ellipsis }).layoutWeight(1)
+          //         Stack({ alignContent: Alignment.Start }) {
+          //           Row() {
+          //           }.width(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
+          //           .backgroundColor(Color.Red)
+          //           .height('100%')
+          //           .borderRadius(6)
+          //
+          //           Text(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
+          //             .fontColor(Color.White).width('100%')
+          //             .textAlign(TextAlign.Center)
+          //             .fontSize(10)
+          //         }
+          //         .backgroundColor(Color.Gray)
+          //         .height(10)
+          //         .layoutWeight(1)
+          //         .borderRadius(6)
+          //
+          //         Text((+item.status === 3 ? '已暂停' : +item.status === 1 ? '已完成' :
+          //           +item.status === 2 ? '下载中' : item.status === 1 ? '下载失败' : '待下载'))
+          //           .maxLines(2)
+          //           .textOverflow({ overflow: TextOverflow.Ellipsis })
+          //           .layoutWeight(1)
+          //           .textAlign(TextAlign.End)
+          //           .fontColor(Color.Red)
+          //           .margin({
+          //             left: 16
+          //           })
+          //       }.width('100%')
+          //       .height(48)
+          //       .backgroundColor(Color.White)
+          //       .padding({
+          //         left: 16,
+          //         right: 16
+          //       })
+          //     }
+          //   }))
+          // }
 
         }.width('100%').height('100%')
       }.tabBar(this.tabBuilder(0, '已下载'))
 
       TabContent() {
         Column() {
-          List({ space: 12 }) {
-            ForEach(this.downloadingList, ((item: DownloadInfo) => {
-              ListItem() {
-                Row() {
-                  Text(item.url).maxLines(2)
-                    .layoutWeight(1)
-                  Stack({ alignContent: Alignment.Start }) {
-                    Row() {
-                    }.width(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
-                    .backgroundColor(Color.Red)
-                    .height('100%')
-                    .borderRadius(6)
-
-                    Text(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
-                      .fontColor(Color.White).width('100%')
-                      .textAlign(TextAlign.Center)
-                      .fontSize(10)
-                  }
-                  .backgroundColor(Color.Gray)
-                  .height(10)
-                  .layoutWeight(1)
-                  .borderRadius(6)
-
-                  Text((+item.status === 0 ? '已暂停' : +item.status === 1 ? '已完成' :
-                    +item.status === 2 ? '下载中' : '下载失败'))
-                    .maxLines(2)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .layoutWeight(1)
-                    .textAlign(TextAlign.End)
-                    .fontColor(Color.Red)
-                    .margin({
-                      left: 16
-                    })
-                }.width('100%')
-                .height(48)
-                .backgroundColor(Color.White)
-                .padding({
-                  left: 16,
-                  right: 16
-                })
-              }.onClick(async () => {
-                if (item.status === 2) {
-                  DownloaderUtil.pause(item.taskId);
-
-                } else if (item.status === 0) {
-
-                  try {
-                    const taskObj = await request.agent.getTask(getContext(), item.taskId);
-                    if (taskObj.config.ends === -1) {
-                      DownloaderUtil.downloadFile([{
-                        id: item.downloadId,
-                        url: item.url,
-                        // title:
-                        status: item.status,
-                        begins: item.begins ?? 0,
-                      }], (downloadSize, fileSize, status, i) => {
-                        getContext().eventHub.emit('trigger', true);
-                      })
-                    } else {
-                      await taskObj.resume()
-
-                    }
-                  } catch (e) {
-
-                  }
-
-                }
-
-              })
-            }))
-          }
+          // List({ space: 12 }) {
+          //   ForEach(this.downloadingList, ((item: DownloadInfo) => {
+          //     ListItem() {
+          //       Row() {
+          //         Text(item.url).maxLines(2)
+          //           .layoutWeight(1)
+          //         Stack({ alignContent: Alignment.Start }) {
+          //           Row() {
+          //           }.width(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
+          //           .backgroundColor(Color.Red)
+          //           .height('100%')
+          //           .borderRadius(6)
+          //
+          //           Text(Math.ceil(item.downloadSize * 100 / item.fileSize) + '%')
+          //             .fontColor(Color.White).width('100%')
+          //             .textAlign(TextAlign.Center)
+          //             .fontSize(10)
+          //         }
+          //         .backgroundColor(Color.Gray)
+          //         .height(10)
+          //         .layoutWeight(1)
+          //         .borderRadius(6)
+          //
+          //         Text((+item.status === 0 ? '已暂停' : +item.status === 1 ? '已完成' :
+          //           +item.status === 2 ? '下载中' : '下载失败'))
+          //           .maxLines(2)
+          //           .textOverflow({ overflow: TextOverflow.Ellipsis })
+          //           .layoutWeight(1)
+          //           .textAlign(TextAlign.End)
+          //           .fontColor(Color.Red)
+          //           .margin({
+          //             left: 16
+          //           })
+          //       }.width('100%')
+          //       .height(48)
+          //       .backgroundColor(Color.White)
+          //       .padding({
+          //         left: 16,
+          //         right: 16
+          //       })
+          //     }.onClick(async () => {
+          //       if (item.status === 2) {
+          //         DownloaderUtil.pause(item.taskId);
+          //
+          //       } else if (item.status === 0) {
+          //
+          //         try {
+          //           const taskObj = await request.agent.getTask(getContext(), item.taskId);
+          //           if (taskObj.config.ends === -1) {
+          //             // DownloaderUtil.downloadFile([{
+          //             //   id: item.downloadId,
+          //             //   url: item.url,
+          //             //   // title:
+          //             //   status: item.status,
+          //             //   begins: item.begins ?? 0,
+          //             // }], (downloadSize, fileSize, status, i) => {
+          //             //   getContext().eventHub.emit('trigger', true);
+          //             // })
+          //           } else {
+          //             await taskObj.resume()
+          //
+          //           }
+          //         } catch (e) {
+          //
+          //         }
+          //
+          //       }
+          //
+          //     })
+          //   }))
+          // }
 
         }.width('100%').height('100%')
       }.tabBar(this.tabBuilder(1, '下载中'))

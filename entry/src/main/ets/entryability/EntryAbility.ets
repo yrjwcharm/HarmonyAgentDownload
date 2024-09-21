@@ -54,23 +54,23 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onDestroy() {
-    let predicates = new relationalStore.RdbPredicates('downloadinfo');
-    predicates.equalTo('userID', '1');
-    predicates.equalTo('status', 2).or()
-    predicates.equalTo('status', 0)
-    predicates
-    let list = await SqliteHelper.getInstance(this.context).queryData(predicates)
-    for (let i = 0; i < list.length; i++) {
-      let predicates = new relationalStore.RdbPredicates('downloadinfo');
-      await request.agent.remove(list[i].taskId);
-      predicates.equalTo('downloadId', list[i].downloadId)
-      DownloadManager.writeTmpBytes(this.context, list[i].fileName, async bytes => {
-        await SqliteHelper.getInstance(this.context).update({
-          'status': 0,
-          begins: bytes,
-        }, predicates)
-      })
-
-    }
+    // let predicates = new relationalStore.RdbPredicates('downloadinfo');
+    // predicates.equalTo('userID', '1');
+    // predicates.equalTo('status', 2).or()
+    // predicates.equalTo('status', 0)
+    // predicates
+    // let list = await SqliteHelper.getInstance(this.context).queryData(predicates)
+    // for (let i = 0; i < list.length; i++) {
+    //   let predicates = new relationalStore.RdbPredicates('downloadinfo');
+    //   await request.agent.remove(list[i].taskId);
+    //   predicates.equalTo('downloadId', list[i].downloadId)
+    //   DownloadManager.writeTmpBytes(this.context, list[i].fileName, async bytes => {
+    //     await SqliteHelper.getInstance(this.context).update({
+    //       'status': 0,
+    //       begins: bytes,
+    //     }, predicates)
+    //   })
+    //
+    // }
   }
 }

@@ -1,19 +1,9 @@
 import { request } from '@kit.BasicServicesKit';
-import { relationalStore, ValuesBucket } from '@kit.ArkData';
-import { DownloadManager } from '../downloadmanager/DownloadManager';
 import { Log } from '@abner/log';
+import { DownloadManager } from '../downloadmanager/DownloadManager';
+import { relationalStore, ValuesBucket } from '@kit.ArkData';
+import { API_COMMON_INTERFACE } from '../interface/ICommon';
 
-
-export interface IDownload {
-  url: string;
-  id: string;
-  pro?: number;
-  status?: number;
-  begins?: number;
-  moduleType?: number;
-  title?: string;
-
-}
 
 export class DownloaderUtil {
   static deleteTask = async (downloadTask: request.agent.Task) => {
@@ -38,14 +28,41 @@ export class DownloaderUtil {
     await taskObj.resume()
   }
 
-  static async downloadFile(downloadList: IDownload[],
+  static async downloadFile(data: API_COMMON_INTERFACE.ICacheCourse | API_COMMON_INTERFACE.IStudyMaterial,
+    moduleType: number,
     callback: (downloadSize: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
+    let downloadList: API_COMMON_INTERFACE.IPackage[] = [];
+    let maxObj: API_COMMON_INTERFACE.IPackage | undefined = undefined;
+    if ((data as API_COMMON_INTERFACE.ICacheCourse).playbackList?.length > 0) {
+      for (let i = 0; i < (data as API_COMMON_INTERFACE.ICacheCourse).playbackList.length; i++) {
+        let item = (data as API_COMMON_INTERFACE.ICacheCourse).playbackList[i];
+        if (item.imPackage.url && item.playbackImg && item.videoPackage.url) {
+          downloadList.push({
+            url: item.imPackage.url,
+            size: item.imPackage.size,
+            playbackName: item.playbackName,
+            fid: item.fid
+          },
+            {
+              url: item.videoPackage.url,
+              size: item.videoPackage.size,
+              playbackName: item.playbackName,
+              fid: item.fid
+            }, {
+              url: item.playbackImg, playbackName: item.playbackName,
+              fid: item.fid
+            })
+        }
+      }
+      let maxSize = Math.max(...downloadList.filter(item => item.size).map(item => parseInt(item.size as string)));
+      maxObj = downloadList.find(item => parseInt(item.size as string) === maxSize);
+    }
+
     for (let i = 0; i < downloadList.length; i++) {
       let item = downloadList[i];
       let downloadConfig: request.agent.Config = {
         action: request.agent.Action.DOWNLOAD,
         url: item.url,
-        title: item.title,
         mode: request.agent.Mode.FOREGROUND,
         retry: true,
         network: request.agent.Network.ANY,
@@ -53,39 +70,55 @@ export class DownloaderUtil {
         overwrite: true,
         gauge: true,
         priority: 0,
-        begins: item.begins ?? 0
+        begins: data.begins ?? 0
       }
       try {
         let downloadTask = await request.agent.create(getContext(), downloadConfig);
         let fileName = item.url.substring(item.url.lastIndexOf('/') + 1);
         let valuesBuket: ValuesBucket = {
-          'userID': '1',
-          'taskID': downloadTask.tid, //必传
+          'userId': data.userId,
+          'taskId': downloadTask.tid, //必传
+          'downloadId': moduleType === 1 ? (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber :
+          (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber, //必传
           'url': item.url, //必传
           'filePath': getContext().cacheDir,
           'fileName': fileName,
-          'downloadId': item.id, //必传
-          'moduleType': 2,
-          "begins": item.begins ?? 0
+          "begins": data.begins ?? 0
         }
-        let predicates = new relationalStore.RdbPredicates('downloadinfo');
-        predicates.equalTo('downloadId', item.id);
+        let predicates: relationalStore.RdbPredicates | undefined = undefined;
+        if (moduleType == 1) { //缓存课程
+          predicates = new relationalStore.RdbPredicates('cachecourse');
+          predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber)
+        } else {
+          //学习资料
+          predicates = new relationalStore.RdbPredicates('studymaterial');
+          predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber)
+        }
         let progressCallback = (progress: request.agent.Progress) => {
+
+          console.log('进度更新...', progress.processed, progress.sizes[0])
+
           DownloadManager.getInstance()
-            .progressCallback(valuesBuket, progress, downloadTask, predicates, callback);
+            .progressCallback(moduleType, valuesBuket, progress, downloadTask,
+              predicates as relationalStore.RdbPredicates,
+              callback, item);
         }
         let completedCallback = (progress: request.agent.Progress) => {
           DownloadManager.getInstance()
-            .completedCallback(valuesBuket, progress, downloadTask, predicates, callback);
+            .completedCallback(moduleType, valuesBuket, progress, downloadTask,
+              predicates as relationalStore.RdbPredicates,
+              callback);
         };
         let pauseCallback = (progress: request.agent.Progress) => {
           DownloadManager.getInstance()
-            .pausedCallback(valuesBuket, progress, downloadTask, predicates, callback);
+            .pausedCallback(moduleType, valuesBuket, progress, downloadTask,
+              predicates as relationalStore.RdbPredicates, callback);
 
         }
         let failedCallback = (progress: request.agent.Progress) => {
           DownloadManager.getInstance()
-            .failedCallback(valuesBuket, progress, downloadTask, predicates, callback);
+            .failedCallback(moduleType, valuesBuket, progress, downloadTask,
+              predicates as relationalStore.RdbPredicates, callback);
         }
         //四种状态
         downloadTask.on('progress', progressCallback)
