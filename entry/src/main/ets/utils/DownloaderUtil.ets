@@ -105,6 +105,13 @@ export class DownloaderUtil {
           predicates = new relationalStore.RdbPredicates('cachecourse');
           predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber)
         } else {
+          let dataSource = data as API_COMMON_INTERFACE.IStudyMaterial;
+          valuesBuket.entityNumber = dataSource.entityNumber;
+          valuesBuket.parentNumber = dataSource.parentNumber;
+          valuesBuket.rootNumber = dataSource.rootNumber;
+          valuesBuket.name = dataSource.name;
+          valuesBuket.entityType = dataSource.entityType;
+          valuesBuket.fileSizeStr = dataSource.fileSizeStr;
           //学习资料
           predicates = new relationalStore.RdbPredicates('studymaterial');
           predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber)
