@@ -35,6 +35,44 @@ export class DownloadManager {
     }
   }
 
+  public static mergedObj(data: API_COMMON_INTERFACE.IPackage_1[]) {
+    // 使用Map来存储合并后的数据
+    const mergedData: Map<string, API_COMMON_INTERFACE.IPackage_1> = new Map();
+
+    data.forEach(entry => {
+      const fid = entry.fid;
+      const imPackageUrl = entry.imPackageUrl;
+      const videoPackageUrl = entry.videoPackageUrl;
+      const playbackImg = entry.playbackImg;
+
+      // 如果该fid还没有对应的条目，则初始化一个
+      if (!mergedData.has(fid)) {
+        mergedData.set(fid, {
+          fid,
+          imPackageUrl: "",
+          videoPackageUrl: "",
+          playbackImg: ""
+        });
+      }
+
+      // 合并非空属性
+      const existingEntry = mergedData.get(fid) as API_COMMON_INTERFACE.IPackage_1;
+      if (imPackageUrl) {
+        existingEntry.imPackageUrl = imPackageUrl;
+      }
+      if (videoPackageUrl) {
+        existingEntry.videoPackageUrl = videoPackageUrl;
+      }
+      if (playbackImg) {
+        existingEntry.playbackImg = playbackImg;
+      }
+    });
+
+    // 将Map转换为数组
+    const result = Array.from(mergedData.values());
+    return result;
+  }
+
   public static getPackage(fileName: string, item: API_COMMON_INTERFACE.IPackage) {
     let imPackageUrl = '', videoPackageUrl = '', playbackImg = '';
     if (fileName.lastIndexOf('.jpg') != -1) {
@@ -79,8 +117,9 @@ export class DownloadManager {
             setArr.forEach(item => {
               uniquePlayBackUrl.push(item);
             })
-            let newUniqueArr = uniquePlayBackUrl.map(item => JSON.parse(item))
-            valuesBuket.playBackUrl = JSON.stringify(newUniqueArr);
+            let newUniqueArr = uniquePlayBackUrl.map(item => JSON.parse(item)) as API_COMMON_INTERFACE.IPackage_1[];
+            let merged = DownloadManager.mergedObj(newUniqueArr);
+            valuesBuket.playBackUrl = JSON.stringify(merged);
           }
           await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates);
         } else {
