@@ -79,6 +79,7 @@ export default class SqliteHelper {
       + "fileSizeStr TEXT, " //用户id
       + "taskId TEXT, " //当前下载任务id
       + "url TEXT, "
+      + "fid TEXT, "
       + "filePath TEXT, "
       + "fileName TEXT, "
       + "fileSize INTEGER, " // 文件大小
@@ -209,7 +210,7 @@ export default class SqliteHelper {
     return new Promise(async (resolve, reject) => {
       SqliteHelper.rdbStore?.query(predicates,
         ['userId', 'entityNumber', 'parentNumber', 'rootNumber', 'name', 'entityType', 'fileSizeStr',
-          'taskId', 'url', 'filePath', 'fileName', 'downloadSize',
+          'taskId', 'url', 'fid', 'filePath', 'fileName', 'downloadSize',
           'fileSize', 'status', 'downloadId',
           'begins']).then(resultSet => {
         while (resultSet?.goToNextRow()) {
@@ -222,6 +223,7 @@ export default class SqliteHelper {
           const fileSizeStr = resultSet.getString(resultSet.getColumnIndex('fileSizeStr'));
           const taskId = resultSet.getString(resultSet.getColumnIndex('taskId'));
           const url = resultSet.getString(resultSet.getColumnIndex('url'));
+          const fid = resultSet.getString(resultSet.getColumnIndex('fid'));
           const filePath = resultSet.getString(resultSet.getColumnIndex('filePath'));
           const fileName = resultSet.getString(resultSet.getColumnIndex('fileName'));
           const fileSize = resultSet.getLong(resultSet.getColumnIndex('fileSize'));
@@ -231,7 +233,7 @@ export default class SqliteHelper {
           const begins = resultSet.getLong(resultSet.getColumnIndex('begins'))
           let studyMaterial: StudyMaterial =
             new StudyMaterial(userId, entityNumber, parentNumber, rootNumber, name, entityType, fileSizeStr, taskId,
-              url, filePath, fileName, fileSize, downloadSize, status, downloadId, begins)
+              url, fid, filePath, fileName, fileSize, downloadSize, status, downloadId, begins)
           list.push(studyMaterial);
         }
         resolve(list);

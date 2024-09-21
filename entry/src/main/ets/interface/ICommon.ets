@@ -60,6 +60,7 @@ export declare namespace API_COMMON_INTERFACE {
     fileSizeStr: string,
     fileSize: number,
     url: string,
+    fid: string,
     begins?: number,
 
   }

@@ -92,6 +92,7 @@ export class DownloadManager {
     return package_1;
   }
 
+  //进度监听
   public static async progressCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
@@ -108,6 +109,7 @@ export class DownloadManager {
       try {
         if (list.length > 0) {
           if (moduleType === 1) {
+            //缓存课程逻辑
             let package_1 = DownloadManager.getPackage(valuesBuket.fileName as string, item);
             let firstPackage: API_COMMON_INTERFACE.IPackage_1[] =
               JSON.parse((list[0] as API_COMMON_INTERFACE.ICacheCourse).playbackUrl) as API_COMMON_INTERFACE.IPackage_1[]
@@ -124,6 +126,7 @@ export class DownloadManager {
           await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates);
         } else {
           if (moduleType === 1) {
+            //缓存课程逻辑
             let package_1 = DownloadManager.getPackage(valuesBuket.fileName as string, item);
             valuesBuket.playBackUrl = JSON.stringify([package_1]);
           }
@@ -134,7 +137,7 @@ export class DownloadManager {
         console.log(e.message)
       }
       if (moduleType === 1) {
-        //缓存课程 以最大下载字节数 走进度
+        //缓存课程 以最大fileSize字节数显示进度
         if (item.url === maxObj?.url) {
           callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.RUNNING,
             valuesBuket.downloadId as string,

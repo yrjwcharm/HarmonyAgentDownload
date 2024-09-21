@@ -1,6 +1,6 @@
 export class StudyMaterial {
   constructor(userId: string, entityNumber: string, parentNumber: number, rootNumber: number, name: string,
-    entityType: number, fileSizeStr: string, taskId: string, url: string, filePath: string,
+    entityType: number, fileSizeStr: string, taskId: string, url: string, fid: string, filePath: string,
     fileName: string, fileSize: number, downloadSize: number, status: number, downloadId: string, begins: number) {
     this._userId = userId;
     this._entityNumber = entityNumber;
@@ -11,6 +11,7 @@ export class StudyMaterial {
     this._fileSizeStr = fileSizeStr;
     this._taskId = taskId;
     this._url = url;
+    this._fid = fid;
     this._filePath = filePath;
     this._fileName = fileName;
     this._fileSize = fileSize;
@@ -107,6 +108,16 @@ export class StudyMaterial {
   }
 
   public set url(value: string) {
+    this._url = value;
+  }
+
+  private _fid: string;
+
+  public get fid(): string {
+    return this._fid;
+  }
+
+  public set fid(value: string) {
     this._url = value;
   }
 

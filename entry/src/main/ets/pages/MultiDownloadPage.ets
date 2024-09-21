@@ -7,55 +7,68 @@ import { router } from '@kit.ArkUI';
 struct MultiFileDownload {
   @State statusText: string = '下载'
   @State taskId: string = '';
-  @State dataSource: API_COMMON_INTERFACE.ICacheCourse = {
-    "playbackList": [{
-      "imPackage": {
-        "size": "11354",
-        "url": "https://d.wenzaizhibo.com/video-signal/8faf40a3a4bb4aa80143aeaa8acea31a/group/0/0.tar.gz?OSSAccessKeyId\u003dLTAI4G97E1JngXNN8WxsY4FN\u0026Expires\u003d1726839797\u0026Signature\u003dRWCQvCYK%2FdyBfg2cj3VSLY%2Fdvfs%3D"
-      },
-      "videoPackage": {
-        "size": "31648774",
-        "url": 'https://vd2.bdstatic.com/mda-pkkf9qb7zksdaqs9/576p/h264/1700564765354260319/mda-pkkf9qb7zksdaqs9.mp4',
-
-      },
-      "roomId": "62091504722899810",
-      "sessionId": 1,
-      "playbackName": "课前回放",
-      "duration": 786,
-      "playbackImg": "https://imgs.genshuixue.com/00-x-upload/snapshot/205840692/00001.jpg",
-      "fid": "205840692"
-    }, {
-      "imPackage": {
-        "size": "35174",
-        "url": "https://d.wenzaizhibo.com/video-signal/283434793034a2dba4e51da34ca2dfa9/group/40104303/40104303.tar.gz?OSSAccessKeyId\u003dLTAI4G97E1JngXNN8WxsY4FN\u0026Expires\u003d1726839798\u0026Signature\u003d0KZQ%2BRW80tbD%2Faku27FEfO49%2Bp0%3D"
-      },
-      "videoPackage": {
-        "size": "20549967",
-        "url": 'https://vd4.bdstatic.com/mda-pku9q3zt0rzybip0/hd/cae_h264/1701381974031001593/mda-pku9q3zt0rzybip0.mp4',
-      },
-      "roomId": "6209080866069850",
-      "sessionId": 0,
-      "playbackName": "课中回放",
-      "duration": 5884,
-      "playbackImg": "https://imgs.genshuixue.com/00-x-upload/snapshot/205840151/00001.jpg",
-      "fid": "205840151"
-    }],
-    "bigRoomId": "6209080866069850",
-    "subRoomId": "62091504722899810",
-    "version": "v2",
-    "subClazzNumber": "19680276488520064",
-    "property": "0",
-    "roomType": 0,
-    "layoutType": 1,
-    "layoutTypeV2": 1,
-    "flexiblySwitchGreyFlag": false,
-    "clazzLessonNumber": "9801550417103232",
-    "clazzLessonName": "围棋初识：基本规则和吃子游戏",
-    "clazzLessonTagDesc": "第1讲",
-    "clazzNumber": "9801550416710016",
-    "clazzName": "1-4年级 围棋课-提升孩子专注力，培养全局思维",
-    userId: '1'
+  @State dataSource: API_COMMON_INTERFACE.IStudyMaterial = {
+    "userId": '1',
+    "entityNumber": "9880849992982656",
+    "parentNumber": 9880849992589440,
+    "rootNumber": 9880848821330816,
+    "name": "第1讲-围棋初识：基本规则和吃子游戏.pdf",
+    "entityType": 120,
+    "fileSizeStr": "7.11M",
+    "fileSize": 7453890,
+    "url": "https://files.genshuixue.com/1796825109_4t7gqwt2.pdf",
+    "fid": "1796825109"
   }
+
+  // @State dataSource: API_COMMON_INTERFACE.ICacheCourse = {
+  //   "playbackList": [{
+  //     "imPackage": {
+  //       "size": "11354",
+  //       "url": "https://d.wenzaizhibo.com/video-signal/8faf40a3a4bb4aa80143aeaa8acea31a/group/0/0.tar.gz?OSSAccessKeyId\u003dLTAI4G97E1JngXNN8WxsY4FN\u0026Expires\u003d1726839797\u0026Signature\u003dRWCQvCYK%2FdyBfg2cj3VSLY%2Fdvfs%3D"
+  //     },
+  //     "videoPackage": {
+  //       "size": "31648774",
+  //       "url": 'https://vd2.bdstatic.com/mda-pkkf9qb7zksdaqs9/576p/h264/1700564765354260319/mda-pkkf9qb7zksdaqs9.mp4',
+  //
+  //     },
+  //     "roomId": "62091504722899810",
+  //     "sessionId": 1,
+  //     "playbackName": "课前回放",
+  //     "duration": 786,
+  //     "playbackImg": "https://imgs.genshuixue.com/00-x-upload/snapshot/205840692/00001.jpg",
+  //     "fid": "205840692"
+  //   }, {
+  //     "imPackage": {
+  //       "size": "35174",
+  //       "url": "https://d.wenzaizhibo.com/video-signal/283434793034a2dba4e51da34ca2dfa9/group/40104303/40104303.tar.gz?OSSAccessKeyId\u003dLTAI4G97E1JngXNN8WxsY4FN\u0026Expires\u003d1726839798\u0026Signature\u003d0KZQ%2BRW80tbD%2Faku27FEfO49%2Bp0%3D"
+  //     },
+  //     "videoPackage": {
+  //       "size": "20549967",
+  //       "url": 'https://vd4.bdstatic.com/mda-pku9q3zt0rzybip0/hd/cae_h264/1701381974031001593/mda-pku9q3zt0rzybip0.mp4',
+  //     },
+  //     "roomId": "6209080866069850",
+  //     "sessionId": 0,
+  //     "playbackName": "课中回放",
+  //     "duration": 5884,
+  //     "playbackImg": "https://imgs.genshuixue.com/00-x-upload/snapshot/205840151/00001.jpg",
+  //     "fid": "205840151"
+  //   }],
+  //   "bigRoomId": "6209080866069850",
+  //   "subRoomId": "62091504722899810",
+  //   "version": "v2",
+  //   "subClazzNumber": "19680276488520064",
+  //   "property": "0",
+  //   "roomType": 0,
+  //   "layoutType": 1,
+  //   "layoutTypeV2": 1,
+  //   "flexiblySwitchGreyFlag": false,
+  //   "clazzLessonNumber": "9801550417103232",
+  //   "clazzLessonName": "围棋初识：基本规则和吃子游戏",
+  //   "clazzLessonTagDesc": "第1讲",
+  //   "clazzNumber": "9801550416710016",
+  //   "clazzName": "1-4年级 围棋课-提升孩子专注力，培养全局思维",
+  //   userId: '1'
+  // }
 
   async aboutToAppear() {
     this.initData();
