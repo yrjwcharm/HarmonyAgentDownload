@@ -2,10 +2,7 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
-import { relationalStore } from '@kit.ArkData';
-import { request } from '@kit.BasicServicesKit';
 import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
-import { DownloadManager } from '../downloadmanager/DownloadManager';
 
 let id: number; // 申请短时任务ID
 let delayTime: number; // 本次申请短时任务的剩余时间
@@ -54,23 +51,6 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onDestroy() {
-    // let predicates = new relationalStore.RdbPredicates('downloadinfo');
-    // predicates.equalTo('userID', '1');
-    // predicates.equalTo('status', 2).or()
-    // predicates.equalTo('status', 0)
-    // predicates
-    // let list = await SqliteHelper.getInstance(this.context).queryData(predicates)
-    // for (let i = 0; i < list.length; i++) {
-    //   let predicates = new relationalStore.RdbPredicates('downloadinfo');
-    //   await request.agent.remove(list[i].taskId);
-    //   predicates.equalTo('downloadId', list[i].downloadId)
-    //   DownloadManager.writeTmpBytes(this.context, list[i].fileName, async bytes => {
-    //     await SqliteHelper.getInstance(this.context).update({
-    //       'status': 0,
-    //       begins: bytes,
-    //     }, predicates)
-    //   })
-    //
-    // }
+
   }
 }

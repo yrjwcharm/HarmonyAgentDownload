@@ -18,6 +18,27 @@ export class DownloadManager {
     return DownloadManager.instance;
   }
 
+  //退出App暂停
+  public static async exitApp(context: Context, moduleType: number) {
+    let predicates = new relationalStore.RdbPredicates(moduleType === 1 ? 'cachecourse' : 'studymaterial');
+    predicates.equalTo('status', 2).or()
+    predicates.equalTo('status', 0)
+    predicates
+    let list = await SqliteHelper.getInstance(context).queryData(predicates)
+    for (let i = 0; i < list.length; i++) {
+      let predicates = new relationalStore.RdbPredicates(moduleType === 1 ? 'cachecourse' : 'studymaterial');
+      await request.agent.remove(list[i].taskId);
+      predicates.equalTo('downloadId', list[i].downloadId)
+      DownloadManager.writeTmpBytes(context, list[i].fileName, async bytes => {
+        await SqliteHelper.getInstance(context).update({
+          'status': 0,
+          begins: bytes,
+        }, predicates)
+      })
+
+    }
+  }
+
   public static getPackage(fileName: string, item: API_COMMON_INTERFACE.IPackage) {
     let imPackageUrl = '', videoPackageUrl = '', playbackImg = '';
     if (fileName.indexOf('.jpg') != -1) {
