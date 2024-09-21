@@ -30,6 +30,7 @@ export declare namespace API_COMMON_INTERFACE {
     layoutTypeV2: number,
     flexiblySwitchGreyFlag: boolean,
     begins?: number, //数据库必传字段
+    playbackUrl?: string
 
     clazzLessonNumber: string, //课节id
     clazzLessonName: string, //课节名称
@@ -60,7 +61,8 @@ export declare namespace API_COMMON_INTERFACE {
     fileSizeStr: string,
     fileSize: number,
     url: string,
-    begins?: number
+    begins?: number,
+
   }
 
   interface IPackage_1 {

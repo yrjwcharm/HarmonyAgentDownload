@@ -1,5 +1,6 @@
 import { API_COMMON_INTERFACE } from '../interface/ICommon';
 import { DownloaderUtil } from '../utils/DownloaderUtil';
+import { router } from '@kit.ArkUI';
 
 @Entry
 @Component
@@ -88,6 +89,11 @@ struct MultiFileDownload {
         DownloaderUtil.downloadFile(this.dataSource, 1, (downloadSize, fileSize, status, id, taskId) => {
           console.log('进度更新值计算', Math.trunc(downloadSize * 100 / fileSize) + '%')
         });
+      })
+      Button('跳转下一页面').onClick(() => {
+        router.pushUrl({
+          url: 'pages/ReadSqlitePage'
+        })
       })
       // List({ space: 12 }) {
       //   ForEach(this.downloadList, (item: IDownload) => {

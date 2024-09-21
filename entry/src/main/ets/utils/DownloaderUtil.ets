@@ -17,17 +17,6 @@ export class DownloaderUtil {
     }
   }
 
-  static async pause(taskId: string) {
-    const taskObj = await request.agent.getTask(getContext(), taskId);
-    await taskObj.pause();
-
-  }
-
-  static async resume(taskId: string, callback?: (code: number) => void) {
-    const taskObj = await request.agent.getTask(getContext(), taskId);
-    await taskObj.resume()
-  }
-
   static async downloadFile(data: API_COMMON_INTERFACE.ICacheCourse | API_COMMON_INTERFACE.IStudyMaterial,
     moduleType: number,
     callback: (downloadSize: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
@@ -73,14 +62,15 @@ export class DownloaderUtil {
       }
       try {
         let downloadTask = await request.agent.create(getContext(), downloadConfig);
+        let downloadId = moduleType === 1 ? (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber :
+        (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber
         let fileName = item.url.substring(item.url.lastIndexOf('/') + 1);
         let valuesBuket: ValuesBucket = {
           'userId': data.userId,
           'taskId': downloadTask.tid, //必传
-          'downloadId': moduleType === 1 ? (data as API_COMMON_INTERFACE.ICacheCourse).clazzLessonNumber :
-          (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber, //必传
+          'downloadId': downloadId, //必传
           'url': item.url, //必传
-          'filePath': getContext().cacheDir,
+          'filePath': './',
           'fileName': fileName,
           "begins": data.begins ?? 0
         }

@@ -4,6 +4,8 @@ import { CacheCourse } from '../model/CacheCourse';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Log } from '@abner/log';
 import { StudyMaterial } from '../model/StudyMaterial';
+import { JSON } from '@kit.ArkTS';
+import { API_COMMON_INTERFACE } from '../interface/ICommon';
 
 export default class SqliteHelper {
   private static instance: SqliteHelper
@@ -136,6 +138,15 @@ export default class SqliteHelper {
     })
   }
 
+  public queryData(predicates: relationalStore.RdbPredicates,
+    moduleType: number): Promise<Array<CacheCourse> | Array<StudyMaterial>> {
+    if (moduleType === 1) {
+      return this.queryCacheCourseData(predicates);
+    } else {
+      return this.queryStudyMaterialData(predicates);
+    }
+  }
+
   // 查询缓存课程
   public queryCacheCourseData(predicates: relationalStore.RdbPredicates): Promise<Array<CacheCourse>> {
     let list: Array<CacheCourse> = [];
@@ -175,7 +186,8 @@ export default class SqliteHelper {
           const downloadId = resultSet.getString(resultSet.getColumnIndex('downloadId'))
           const begins = resultSet.getLong(resultSet.getColumnIndex('begins'))
           let cacheCourse: CacheCourse =
-            new CacheCourse(userId, JSON.parse(playbackList), bigRoomId, subRoomId, version, subClazzNumber
+            new CacheCourse(userId, JSON.parse(playbackList) as API_COMMON_INTERFACE.IPlayback[], bigRoomId, subRoomId,
+              version, subClazzNumber
               , property, roomType, layoutType, layoutTypeV2, flexiblySwitchGreyFlag == 1, clazzLessonNumber,
               clazzLessonName, clazzLessonTagDesc, clazzNumber, clazzName, taskId, url, filePath, fileName, playBackUrl,
               fileSize, downLoadSize, status, downloadId, begins)
@@ -185,6 +197,7 @@ export default class SqliteHelper {
         resultSet?.close()
         // 释放数据集的内存
       }).catch((e: BusinessError) => {
+        console.log('查询数据异常...', e.message)
         reject(e);
       })
     })

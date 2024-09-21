@@ -21,7 +21,7 @@ export class DownloadManager {
     predicates.equalTo('status', 2).or()
     predicates.equalTo('status', 0)
     predicates
-    let list = await SqliteHelper.getInstance(context).queryData(predicates)
+    let list = await SqliteHelper.getInstance(context).queryData(predicates, moduleType)
     for (let i = 0; i < list.length; i++) {
       let predicates = new relationalStore.RdbPredicates(moduleType === 1 ? 'cachecourse' : 'studymaterial');
       await request.agent.remove(list[i].taskId);
@@ -66,13 +66,13 @@ export class DownloadManager {
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number);
       valuesBuket.status = DownloadStatus.RUNNING;
       //判断当前下载任务是否已经在数据库中
-      let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
+      let list = await SqliteHelper.getInstance(getContext()).queryData(predicates, moduleType);
       try {
         if (list.length > 0) {
           if (moduleType === 1) {
             let package_1 = DownloadManager.getPackage(valuesBuket.fileName as string, item);
             let firstPackage: API_COMMON_INTERFACE.IPackage_1[] =
-              JSON.parse(list[0].playbackUrl) as API_COMMON_INTERFACE.IPackage_1[]
+              JSON.parse((list[0] as API_COMMON_INTERFACE.ICacheCourse).playbackUrl) as API_COMMON_INTERFACE.IPackage_1[]
             let urls: API_COMMON_INTERFACE.IPackage_1[] = [...firstPackage, package_1]
             let setArr = new Set(urls.map((item) => JSON.stringify(item)));
             let uniquePlayBackUrl: string[] = [];
@@ -158,7 +158,7 @@ export class DownloadManager {
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,
   ) {
     valuesBuket.downloadSize = progress.sizes[0] + (valuesBuket.begins as number);
-    let list = await SqliteHelper.getInstance(getContext()).queryData(predicates);
+    let list = await SqliteHelper.getInstance(getContext()).queryData(predicates, moduleType);
     valuesBuket.fileSize = list[0].fileSize;
     valuesBuket.status = DownloadStatus.FAILED;
     await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)

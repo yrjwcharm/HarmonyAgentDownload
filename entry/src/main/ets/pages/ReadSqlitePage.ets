@@ -1,8 +1,7 @@
-import SqliteHelper from '../db/SqliteHelper';
+import { Log } from '@abner/log';
 import { relationalStore } from '@kit.ArkData';
+import SqliteHelper from '../db/SqliteHelper';
 import { CacheCourse } from '../model/CacheCourse';
-import { DownloaderUtil } from '../utils/DownloaderUtil';
-import { request } from '@kit.BasicServicesKit';
 
 @Entry
 @Component
@@ -17,12 +16,12 @@ struct ReadSqlitePage {
 
   async aboutToAppear() {
     let predicates = new relationalStore.RdbPredicates('downloadinfo');
-    predicates.equalTo('userID', '1');
-    this.timer = setInterval(async () => {
-      let list = await SqliteHelper.getInstance(getContext()).queryData(predicates)
-      this.downloadedList = list.filter(item => item.status == 1);
-      this.downloadingList = list.filter(item => item.status == 2 || item.status == 0);
-    }, 150)
+    predicates.equalTo('userId', '1');
+    let list = await SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
+    Log.init({
+      tag: '参数列表',
+    })
+    Log.info(list);
   }
 
   aboutToDisappear(): void {
