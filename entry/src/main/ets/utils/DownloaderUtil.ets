@@ -21,30 +21,36 @@ export class DownloaderUtil {
     moduleType: number,
     callback: (downloadSize: number, fileSize: number, status: number, id: string, taskId?: string) => void) {
     let downloadList: API_COMMON_INTERFACE.IPackage[] = [];
-    let maxObj: API_COMMON_INTERFACE.IPackage | undefined = undefined;
-    if ((data as API_COMMON_INTERFACE.ICacheCourse).playbackList?.length > 0) {
-      for (let i = 0; i < (data as API_COMMON_INTERFACE.ICacheCourse).playbackList.length; i++) {
-        let item = (data as API_COMMON_INTERFACE.ICacheCourse).playbackList[i];
-        if (item.imPackage.url && item.playbackImg && item.videoPackage.url) {
-          downloadList.push({
-            url: item.imPackage.url,
-            size: item.imPackage.size,
-            playbackName: item.playbackName,
-            fid: item.fid
-          },
-            {
-              url: item.videoPackage.url,
-              size: item.videoPackage.size,
+    let maxObj: API_COMMON_INTERFACE.IPackage | undefined = undefined; //缓存课程最大字节数资源下载url
+    //缓存课程
+    if (moduleType === 1) {
+      if ((data as API_COMMON_INTERFACE.ICacheCourse).playbackList?.length > 0) {
+        for (let i = 0; i < (data as API_COMMON_INTERFACE.ICacheCourse).playbackList.length; i++) {
+          let item = (data as API_COMMON_INTERFACE.ICacheCourse).playbackList[i];
+          if (item.imPackage.url && item.playbackImg && item.videoPackage.url) {
+            //push 需要并行下载的url
+            downloadList.push({
+              url: item.imPackage.url,
+              size: item.imPackage.size,
               playbackName: item.playbackName,
               fid: item.fid
-            }, {
-              url: item.playbackImg, playbackName: item.playbackName,
-              fid: item.fid
-            })
+            },
+              {
+                url: item.videoPackage.url,
+                size: item.videoPackage.size,
+                playbackName: item.playbackName,
+                fid: item.fid
+              }, {
+                url: item.playbackImg, playbackName: item.playbackName,
+                fid: item.fid
+              })
+          }
         }
+        let maxSize = Math.max(...downloadList.filter(item => item.size).map(item => parseInt(item.size as string)));
+        maxObj = downloadList.find(item => parseInt(item.size as string) === maxSize);
       }
-      let maxSize = Math.max(...downloadList.filter(item => item.size).map(item => parseInt(item.size as string)));
-      maxObj = downloadList.find(item => parseInt(item.size as string) === maxSize);
+    } else {
+      downloadList = [data as API_COMMON_INTERFACE.IStudyMaterial];
     }
     for (let i = 0; i < downloadList.length; i++) {
       let item = downloadList[i];
@@ -102,6 +108,7 @@ export class DownloaderUtil {
           valuesBuket.name = dataSource.name;
           valuesBuket.entityType = dataSource.entityType;
           valuesBuket.fileSizeStr = dataSource.fileSizeStr;
+          valuesBuket.fid = dataSource.fid;
           //学习资料
           predicates = new relationalStore.RdbPredicates('studymaterial');
           predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber)

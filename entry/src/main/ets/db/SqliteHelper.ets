@@ -198,7 +198,7 @@ export default class SqliteHelper {
         resultSet?.close()
         // 释放数据集的内存
       }).catch((e: BusinessError) => {
-        console.log('查询数据异常...', e.message)
+        console.log('查询缓存课程数据异常...', e.message)
         reject(e);
       })
     })
@@ -236,10 +236,12 @@ export default class SqliteHelper {
               url, fid, filePath, fileName, fileSize, downloadSize, status, downloadId, begins)
           list.push(studyMaterial);
         }
+        console.log('333', list)
         resolve(list);
         resultSet?.close()
         // 释放数据集的内存
       }).catch((e: BusinessError) => {
+        console.log('查询学习资料数据异常...', e.message)
         reject(e);
       })
     })

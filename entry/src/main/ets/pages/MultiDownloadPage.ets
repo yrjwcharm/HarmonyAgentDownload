@@ -99,7 +99,7 @@ struct MultiFileDownload {
   build() {
     Column() {
       Button('下载').onClick((event: ClickEvent) => {
-        DownloaderUtil.downloadFile(this.dataSource, 1, (downloadSize, fileSize, status, id, taskId) => {
+        DownloaderUtil.downloadFile(this.dataSource, 2, (downloadSize, fileSize, status, id, taskId) => {
           console.log('进度更新值计算', Math.trunc(downloadSize * 100 / fileSize) + '%')
         });
       })

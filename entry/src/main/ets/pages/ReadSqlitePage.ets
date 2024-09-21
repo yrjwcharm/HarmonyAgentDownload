@@ -1,7 +1,6 @@
 import { relationalStore } from '@kit.ArkData';
 import SqliteHelper from '../db/SqliteHelper';
 import { CacheCourse } from '../model/CacheCourse';
-import { API_COMMON_INTERFACE } from '../interface/ICommon';
 
 @Entry
 @Component
@@ -15,11 +14,16 @@ struct ReadSqlitePage {
   private controller: TabsController = new TabsController()
 
   async aboutToAppear() {
-  //   let predicates = new relationalStore.RdbPredicates('cachecourse');
-  //   predicates.equalTo('userId', '1');
-  //   let list = await SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
-  //   let data: API_COMMON_INTERFACE.IPackage_1[] = JSON.parse(list[0].playbackUrl);
-  //   console.log(list[0].url, list[0].fileName, list[0].filePath)
+    //   let predicates = new relationalStore.RdbPredicates('cachecourse');
+    //   predicates.equalTo('userId', '1');
+    //   let list = await SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
+    //   let data: API_COMMON_INTERFACE.IPackage_1[] = JSON.parse(list[0].playbackUrl);
+    //   console.log(list[0].url, list[0].fileName, list[0].filePath)
+
+    let predicates = new relationalStore.RdbPredicates('studymaterial');
+    predicates.equalTo('userId', '1');
+    let list = await SqliteHelper.getInstance(getContext()).queryStudyMaterialData(predicates);
+    console.log('数据结构', list[0].url, list[0].fileName, list[0].filePath)
   }
 
   aboutToDisappear(): void {
