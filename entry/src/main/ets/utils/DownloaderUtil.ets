@@ -70,7 +70,7 @@ export class DownloaderUtil {
           'taskId': downloadTask.tid, //必传
           'downloadId': downloadId, //必传
           'url': item.url, //必传
-          'filePath': './',
+          'filePath': getContext().cacheDir,
           'fileName': fileName,
           "begins": data.begins ?? 0
         }

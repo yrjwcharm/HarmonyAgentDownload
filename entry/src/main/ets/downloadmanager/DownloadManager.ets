@@ -35,16 +35,16 @@ export class DownloadManager {
     }
   }
 
-
   public static getPackage(fileName: string, item: API_COMMON_INTERFACE.IPackage) {
     let imPackageUrl = '', videoPackageUrl = '', playbackImg = '';
-    if (fileName.indexOf('.jpg') != -1) {
+    if (fileName.lastIndexOf('.jpg') != -1) {
       playbackImg = fileName;
-    } else if (fileName.indexOf('.wz1"') != -1) {
+    } else if (fileName.lastIndexOf('.mp4') != -1) {
       videoPackageUrl = fileName
     } else {
       imPackageUrl = fileName
     }
+
     let package_1: API_COMMON_INTERFACE.IPackage_1 = {
       fid: item.fid as string,
       imPackageUrl,
@@ -124,6 +124,9 @@ export class DownloadManager {
       FileUtil.deleteTmpFile(getContext(), valuesBuket.fileName as string);
       if (moduleType === 1) {
         if (maxObj?.url === item.url) {
+          promptAction.showToast({
+            message: "下载完成"
+          })
           callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.COMPLETED,
             valuesBuket.downloadId as string,
             downloadTask.tid)

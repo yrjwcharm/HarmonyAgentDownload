@@ -2,6 +2,7 @@ import { Log } from '@abner/log';
 import { relationalStore } from '@kit.ArkData';
 import SqliteHelper from '../db/SqliteHelper';
 import { CacheCourse } from '../model/CacheCourse';
+import { API_COMMON_INTERFACE } from '../interface/ICommon';
 
 @Entry
 @Component
@@ -15,13 +16,49 @@ struct ReadSqlitePage {
   private controller: TabsController = new TabsController()
 
   async aboutToAppear() {
-    let predicates = new relationalStore.RdbPredicates('downloadinfo');
+    let predicates = new relationalStore.RdbPredicates('cachecourse');
     predicates.equalTo('userId', '1');
     let list = await SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
+    let data: API_COMMON_INTERFACE.IPackage_1[] = JSON.parse(list[0].playbackUrl);
+    console.log('333', JSON.stringify(data));
+    // 使用Map来存储合并后的数据
+    const mergedData: Map<string, API_COMMON_INTERFACE.IPackage_1> = new Map();
+
+    data.forEach(entry => {
+      const fid = entry.fid;
+      const imPackageUrl = entry.imPackageUrl;
+      const videoPackageUrl = entry.videoPackageUrl;
+      const playbackImg = entry.playbackImg;
+
+      // 如果该fid还没有对应的条目，则初始化一个
+      if (!mergedData.has(fid)) {
+        mergedData.set(fid, {
+          fid,
+          imPackageUrl: "",
+          videoPackageUrl: "",
+          playbackImg: ""
+        });
+      }
+
+      // 合并非空属性
+      const existingEntry = mergedData.get(fid) as API_COMMON_INTERFACE.IPackage_1;
+      if (imPackageUrl) {
+        existingEntry.imPackageUrl = imPackageUrl;
+      }
+      if (videoPackageUrl) {
+        existingEntry.videoPackageUrl = videoPackageUrl;
+      }
+      if (playbackImg) {
+        existingEntry.playbackImg = playbackImg;
+      }
+    });
+
+    // 将Map转换为数组
+    const result = Array.from(mergedData.values());
     Log.init({
       tag: '参数列表',
     })
-    Log.info(list);
+    Log.info(result);
   }
 
   aboutToDisappear(): void {

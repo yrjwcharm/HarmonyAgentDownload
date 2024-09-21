@@ -31,7 +31,6 @@ export declare namespace API_COMMON_INTERFACE {
     flexiblySwitchGreyFlag: boolean,
     begins?: number, //数据库必传字段
     playbackUrl?: string
-
     clazzLessonNumber: string, //课节id
     clazzLessonName: string, //课节名称
     clazzLessonTagDesc: string, //课节tag
@@ -70,6 +69,9 @@ export declare namespace API_COMMON_INTERFACE {
     videoPackageUrl: string,
     imPackageUrl: string;
     playbackImg: string
+  }
 
+  interface IMergedData {
+    fid: IPackage_1
   }
 }
