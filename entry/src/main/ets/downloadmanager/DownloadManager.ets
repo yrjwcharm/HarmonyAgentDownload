@@ -35,16 +35,15 @@ export class DownloadManager {
     }
   }
 
-  public static mergedObj(data: API_COMMON_INTERFACE.IPackage_1[]) {
+  //去除对象数组中相同fid 对应资源包非空属性值、并进行统一合并
+  public static mergedObj(data: API_COMMON_INTERFACE.IFidPackage[]) {
     // 使用Map来存储合并后的数据
-    const mergedData: Map<string, API_COMMON_INTERFACE.IPackage_1> = new Map();
-
+    const mergedData: Map<string, API_COMMON_INTERFACE.IFidPackage> = new Map();
     data.forEach(entry => {
       const fid = entry.fid;
       const imPackageUrl = entry.imPackageUrl;
       const videoPackageUrl = entry.videoPackageUrl;
       const playbackImg = entry.playbackImg;
-
       // 如果该fid还没有对应的条目，则初始化一个
       if (!mergedData.has(fid)) {
         mergedData.set(fid, {
@@ -54,9 +53,8 @@ export class DownloadManager {
           playbackImg: ""
         });
       }
-
       // 合并非空属性
-      const existingEntry = mergedData.get(fid) as API_COMMON_INTERFACE.IPackage_1;
+      const existingEntry = mergedData.get(fid) as API_COMMON_INTERFACE.IFidPackage;
       if (imPackageUrl) {
         existingEntry.imPackageUrl = imPackageUrl;
       }
@@ -67,12 +65,11 @@ export class DownloadManager {
         existingEntry.playbackImg = playbackImg;
       }
     });
-
-    // 将Map转换为数组
     const result = Array.from(mergedData.values());
     return result;
   }
 
+  //重组资源包链接
   public static getPackage(fileName: string, item: API_COMMON_INTERFACE.IPackage) {
     let imPackageUrl = '', videoPackageUrl = '', playbackImg = '';
     if (fileName.lastIndexOf('.jpg') != -1) {
@@ -82,14 +79,13 @@ export class DownloadManager {
     } else {
       imPackageUrl = fileName
     }
-
-    let package_1: API_COMMON_INTERFACE.IPackage_1 = {
+    let fidPackage: API_COMMON_INTERFACE.IFidPackage = {
       fid: item.fid as string,
       imPackageUrl,
       videoPackageUrl,
       playbackImg,
     }
-    return package_1;
+    return fidPackage;
   }
 
   //进度监听
@@ -110,16 +106,16 @@ export class DownloadManager {
         if (list.length > 0) {
           if (moduleType === 1) {
             //缓存课程逻辑
-            let package_1 = DownloadManager.getPackage(valuesBuket.fileName as string, item);
-            let firstPackage: API_COMMON_INTERFACE.IPackage_1[] =
-              JSON.parse((list[0] as API_COMMON_INTERFACE.ICacheCourse).playbackUrl) as API_COMMON_INTERFACE.IPackage_1[]
-            let urls: API_COMMON_INTERFACE.IPackage_1[] = [...firstPackage, package_1]
+            let fidPackage = DownloadManager.getPackage(valuesBuket.fileName as string, item);
+            let firstPackage: API_COMMON_INTERFACE.IFidPackage[] =
+              JSON.parse((list[0] as API_COMMON_INTERFACE.ICacheCourse).playbackUrl) as API_COMMON_INTERFACE.IFidPackage[]
+            let urls: API_COMMON_INTERFACE.IFidPackage[] = [...firstPackage, fidPackage]
             let setArr = new Set(urls.map((item) => JSON.stringify(item)));
             let uniquePlayBackUrl: string[] = [];
             setArr.forEach(item => {
               uniquePlayBackUrl.push(item);
             })
-            let newUniqueArr = uniquePlayBackUrl.map(item => JSON.parse(item)) as API_COMMON_INTERFACE.IPackage_1[];
+            let newUniqueArr = uniquePlayBackUrl.map(item => JSON.parse(item)) as API_COMMON_INTERFACE.IFidPackage[];
             let merged = DownloadManager.mergedObj(newUniqueArr);
             valuesBuket.playBackUrl = JSON.stringify(merged);
           }

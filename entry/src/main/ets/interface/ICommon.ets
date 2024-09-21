@@ -17,6 +17,7 @@ export declare namespace API_COMMON_INTERFACE {
     fid: string;
   }
 
+  //缓存课程接口定义
   interface ICacheCourse {
     userId: string,
     playbackList: IPlayback[],
@@ -50,6 +51,7 @@ export declare namespace API_COMMON_INTERFACE {
     // "beginTimeStamp": 1663844400
   }
 
+  //学习资料接口定义
   interface IStudyMaterial {
     userId: string,
     entityNumber: string,
@@ -65,7 +67,7 @@ export declare namespace API_COMMON_INTERFACE {
 
   }
 
-  interface IPackage_1 {
+  interface IFidPackage {
     fid: string;
     videoPackageUrl: string,
     imPackageUrl: string;
@@ -73,6 +75,6 @@ export declare namespace API_COMMON_INTERFACE {
   }
 
   interface IMergedData {
-    fid: IPackage_1
+    fid: IFidPackage
   }
 }
