@@ -1,6 +1,9 @@
 import { relationalStore } from '@kit.ArkData';
 import SqliteHelper from '../db/SqliteHelper';
+import { API_COMMON_INTERFACE } from '../interface/ICommon';
 import { CacheCourse } from '../model/CacheCourse';
+import { fileIo } from '@kit.CoreFileKit';
+import { List } from '@kit.ArkTS';
 
 @Entry
 @Component
@@ -14,16 +17,46 @@ struct ReadSqlitePage {
   private controller: TabsController = new TabsController()
 
   async aboutToAppear() {
-    //   let predicates = new relationalStore.RdbPredicates('cachecourse');
-    //   predicates.equalTo('userId', '1');
-    //   let list = await SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
-    //   let data: API_COMMON_INTERFACE.IPackage_1[] = JSON.parse(list[0].playbackUrl);
-    //   console.log(list[0].url, list[0].fileName, list[0].filePath)
 
-    let predicates = new relationalStore.RdbPredicates('studymaterial');
-    predicates.equalTo('userId', '1');
-    let list = await SqliteHelper.getInstance(getContext()).queryStudyMaterialData(predicates);
-    console.log('数据结构', list[0].url, list[0].filePath + '/' + list[0].fileName)
+  }
+
+  //查询课程
+  queryCacheCourseList(userId: string): Promise<API_COMMON_INTERFACE.ICacheCourse[]> {
+    let predicates = new relationalStore.RdbPredicates('cachecourse');
+    predicates.equalTo('userId', userId);
+    return SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
+  }
+
+  //根据课程id删除课程
+  async delCacheCourseListByClazzNumber(userId: string, clazzNumber: string): Promise<number> {
+    let predicates = new relationalStore.RdbPredicates('cachecourse');
+    predicates.equalTo('userId', userId);
+    predicates.equalTo('clazzNumber', clazzNumber);
+    let list = await SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
+    list.forEach(item => {
+      const path = item.filePath + '/' + item.downloadId
+      fileIo.rmdirSync(path)
+    })
+    return SqliteHelper.getInstance(getContext()).deleteData(predicates);
+  }
+
+  //根据课节id删除缓存课节
+  async delCacheCourseListByClazzLessonNumber(userId: string, clazzLessonNumbers: List<string>): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        for (let i = 0; i < clazzLessonNumbers.length; i++) {
+          let predicates = new relationalStore.RdbPredicates('cachecourse');
+          predicates.equalTo('userId', userId);
+          predicates.equalTo('clazzNumber', clazzLessonNumbers[i]);
+          let list = await SqliteHelper.getInstance(getContext()).queryCacheCourseData(predicates);
+          fileIo.rmdirSync(list[0]?.filePath + '/' + list[0]?.downloadId)
+          await SqliteHelper.getInstance(getContext()).deleteData(predicates);
+        }
+        resolve(1);
+      } catch (e) {
+        reject(0);
+      }
+    })
   }
 
   aboutToDisappear(): void {
