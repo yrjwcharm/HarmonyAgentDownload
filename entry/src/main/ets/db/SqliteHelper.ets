@@ -25,6 +25,7 @@ export default class SqliteHelper {
    * */
   public async initRDB() {
     let cacheCourse = 'cachecourse';
+    let studyMaterial = 'studymaterial';
     const STORE_CONFIG: relationalStore.StoreConfig = {
       name: 'filedownloader.db', // 数据库文件名
       securityLevel: relationalStore.SecurityLevel.S1, // 数据库安全级别
@@ -34,10 +35,8 @@ export default class SqliteHelper {
       isReadOnly: false // 可选参数，指定数据库是否以只读方式打开。该参数默认为false，表示数据库可读可写。该参数为true时，只允许从数据库读取数据，不允许对数据库进行写操作，否则会返回错误码801。
     };
 
-
-    // 判断数据库版本，如果不匹配则需进行升降级操作
     //创建缓存课程信息数据表
-    let SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + cacheCourse + " ("
+    let SQL_CREATE_CACHE_COURSE_TABLE = "CREATE TABLE IF NOT EXISTS " + cacheCourse + " ("
       + "id INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL , "
       + "userId TEXT, " //用户id
       + "playbackList TEXT, " //回放list
@@ -66,9 +65,29 @@ export default class SqliteHelper {
       + "downloadId TEXT, " //下载列表每项id
       + "begins INTEGER"
       + ")";
+    let SQL_CREATE_STUDY_MATERIAL_TABLE = "CREATE TABLE IF NOT EXISTS " + studyMaterial + " ("
+      + "id INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL , "
+      + "userId TEXT, " //用户id
+      + "entityNumber TEXT, " //用户id
+      + "parentNumber LONG, " //用户id
+      + "rootNumber LONG, " //用户id
+      + "name TEXT, " //用户id
+      + "entityType INTEGER, " //用户id
+      + "fileSizeStr TEXT, " //用户id
+      + "taskId TEXT, " //当前下载任务id
+      + "url TEXT, "
+      + "filePath TEXT, "
+      + "fileName TEXT, "
+      + "fileSize INTEGER, " // 文件大小
+      + "downLoadSize INTEGER , " //文件已下载大小
+      + "status INTEGER DEFAULT 3 , " //下载状态  待下载、下载中、已下载、已暂停、下载失败 默认待下载
+      + "downloadId TEXT, " //下载列表每项id
+      + "begins INTEGER"
+      + ")";
     try {
       SqliteHelper.rdbStore = await relationalStore.getRdbStore(this.context, STORE_CONFIG)
-      await SqliteHelper.rdbStore?.executeSql(SQL_CREATE_TABLE)
+      await SqliteHelper.rdbStore?.executeSql(SQL_CREATE_CACHE_COURSE_TABLE)
+      await SqliteHelper.rdbStore?.executeSql(SQL_CREATE_STUDY_MATERIAL_TABLE)
     } catch (e) {
       Log.info("数据库建表异常", e.message);
     }
