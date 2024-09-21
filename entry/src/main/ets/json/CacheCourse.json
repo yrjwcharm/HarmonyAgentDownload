@@ -1,0 +1,78 @@
+{
+  "status": 0,
+  "errorInfo": "",
+  "code": 0,
+  "msg": "",
+  "data": {
+    "userDownLoadClazzInfo": {
+      "clazzNumber": "9801550416710016",
+      "clazzName": "1-4年级 围棋课-提升孩子专注力，培养全局思维",
+      "gradeDesc": "一年级",
+      "subjectDesc": "围"
+    },
+    "counselor": {
+      "teacherNumber": "4273677729425920",
+      "teacherName": "普志豪",
+      "teacherIcon": "https://i.gsxcdn.com/1639176577_hp96b94b.png",
+      "pageUrl": "https://m.gaotu.cn/study/counselorDetail?counselorNumber=4273677729425920",
+      "teacherRole": "二讲老师"
+    },
+    "userDownloadLessonList": [{
+      "clazzLessonNumber": "9801550417103232",
+      "clazzLessonName": "围棋初识：基本规则和吃子游戏",
+      "clazzLessonTagDesc": "第1讲",
+      "lessonStartTimeDesc": "09月22日 周四",
+      "timeInternalDesc": "19:00-20:10",
+      "liveId": "9801550417103232",
+      "liveType": 1,
+      "lessonLiveType": 0,
+      "sessionIdList": null,
+      "lessonType": 0,
+      "videoType": 0,
+      "roomType": 0,
+      "beginTimeStamp": 1663844400
+    }, {
+      "clazzLessonNumber": "9801550417103233",
+      "clazzLessonName": "围棋趣味：堵鼻子和逃跑游戏",
+      "clazzLessonTagDesc": "第2讲",
+      "lessonStartTimeDesc": "09月23日 周五",
+      "timeInternalDesc": "19:00-20:30",
+      "liveId": "9801550417103233",
+      "liveType": 1,
+      "lessonLiveType": 0,
+      "sessionIdList": null,
+      "lessonType": 0,
+      "videoType": 0,
+      "roomType": 0,
+      "beginTimeStamp": 1663930800
+    }, {
+      "clazzLessonNumber": "9801550417103234",
+      "clazzLessonName": "围棋战略：一箭双雕和悬崖游戏",
+      "clazzLessonTagDesc": "第3讲",
+      "lessonStartTimeDesc": "09月24日 周六",
+      "timeInternalDesc": "19:00-20:30",
+      "liveId": "9801550417103234",
+      "liveType": 1,
+      "lessonLiveType": 0,
+      "sessionIdList": null,
+      "lessonType": 0,
+      "videoType": 0,
+      "roomType": 0,
+      "beginTimeStamp": 1664017200
+    }, {
+      "clazzLessonNumber": "9801550417103235",
+      "clazzLessonName": "围棋对弈：决战五路棋盘",
+      "clazzLessonTagDesc": "第4讲",
+      "lessonStartTimeDesc": "09月25日 周日",
+      "timeInternalDesc": "19:00-20:30",
+      "liveId": "9801550417103235",
+      "liveType": 1,
+      "lessonLiveType": 0,
+      "sessionIdList": null,
+      "lessonType": 0,
+      "videoType": 0,
+      "roomType": 0,
+      "beginTimeStamp": 1664103600
+    }]
+  }
+}

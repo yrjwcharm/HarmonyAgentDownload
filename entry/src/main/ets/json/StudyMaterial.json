@@ -1,0 +1,73 @@
+{
+  "code": 0,
+  "success": true,
+  "data": {
+    "path": [
+      {
+        "entityNumber": "9880849992589440",
+        "name": "课堂资料",
+        "entryType": 4,
+        "rootNumber": "19680276488520064"
+      }
+    ],
+    "dirList": [
+      {
+        "entityNumber": "9880849992982656",
+        "name": "第1讲-围棋初识：基本规则和吃子游戏.pdf",
+        "entityType": 120,
+        "entryType": 4,
+        "updateTime": 1663850400,
+        "rootNumber": "19680276488520064",
+        "fileSize": "7.11M",
+        "url": "https://files.genshuixue.com/1796825109_4t7gqwt2.pdf",
+        "isRead": true,
+        "fid": "1796825109"
+      },
+      {
+        "entityNumber": "9886509929078080",
+        "name": "第2讲-围棋趣味：堵鼻子和逃跑游戏.pdf",
+        "entityType": 120,
+        "entryType": 4,
+        "updateTime": 1663936800,
+        "rootNumber": "19680276488520064",
+        "fileSize": "57.73M",
+        "url": "https://files.genshuixue.com/1797891401_o5yfwvvc.pdf",
+        "isRead": true,
+        "fid": "1797891401"
+      },
+      {
+        "entityNumber": "9892257910760320",
+        "name": "第3讲-围棋战略：一箭双雕和悬崖游戏.pdf",
+        "entityType": 120,
+        "entryType": 4,
+        "updateTime": 1664024401,
+        "rootNumber": "19680276488520064",
+        "fileSize": "9.02M",
+        "url": "https://files.genshuixue.com/1798997025_0by4frcb.pdf",
+        "isRead": true,
+        "fid": "1798997025"
+      },
+      {
+        "entityNumber": "9897937845952384",
+        "name": "第4讲-围棋对弈：决战五路棋盘.pdf",
+        "entityType": 120,
+        "entryType": 4,
+        "updateTime": 1664111100,
+        "rootNumber": "19680276488520064",
+        "fileSize": "9.20M",
+        "url": "https://files.genshuixue.com/1800252897_9ndlmeaf.pdf",
+        "isRead": true,
+        "fid": "1800252897"
+      }
+    ],
+    "pager": {
+      "pageSize": 20,
+      "pageNum": 1,
+      "count": 4,
+      "totalPage": 1,
+      "hasMore": false
+    }
+  },
+  "msg": "操作成功",
+  "stackMessage": ""
+}
