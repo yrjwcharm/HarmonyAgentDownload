@@ -3,6 +3,7 @@ import { ValuesBucket } from '@ohos.data.ValuesBucket';
 import { CacheCourse } from '../model/CacheCourse';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Log } from '@abner/log';
+import { StudyMaterial } from '../model/StudyMaterial';
 
 export default class SqliteHelper {
   private static instance: SqliteHelper
@@ -135,8 +136,8 @@ export default class SqliteHelper {
     })
   }
 
-  // userId taskId status  downloadId
-  public queryData(predicates: relationalStore.RdbPredicates): Promise<Array<CacheCourse>> {
+  // 查询缓存课程
+  public queryCacheCourseData(predicates: relationalStore.RdbPredicates): Promise<Array<CacheCourse>> {
     let list: Array<CacheCourse> = [];
     return new Promise(async (resolve, reject) => {
       SqliteHelper.rdbStore?.query(predicates,
@@ -179,6 +180,46 @@ export default class SqliteHelper {
               clazzLessonName, clazzLessonTagDesc, clazzNumber, clazzName, taskId, url, filePath, fileName, playBackUrl,
               fileSize, downLoadSize, status, downloadId, begins)
           list.push(cacheCourse);
+        }
+        resolve(list);
+        resultSet?.close()
+        // 释放数据集的内存
+      }).catch((e: BusinessError) => {
+        reject(e);
+      })
+    })
+  }
+
+  // 查询学习资料
+  public queryStudyMaterialData(predicates: relationalStore.RdbPredicates): Promise<Array<StudyMaterial>> {
+    let list: Array<StudyMaterial> = [];
+    return new Promise(async (resolve, reject) => {
+      SqliteHelper.rdbStore?.query(predicates,
+        ['userId', 'entityNumber', 'parentNumber', 'rootNumber', 'name', 'entityType', 'fileSizeStr',
+          'taskId', 'url', 'filePath', 'fileName', 'downloadSize',
+          'fileSize', 'status', 'downloadId',
+          'begins']).then(resultSet => {
+        while (resultSet?.goToNextRow()) {
+          const userId = resultSet.getString(resultSet.getColumnIndex('userId'));
+          const entityNumber = resultSet.getString(resultSet.getColumnIndex('entityNumber'));
+          const parentNumber = resultSet.getLong(resultSet.getColumnIndex('parentNumber'));
+          const rootNumber = resultSet.getLong(resultSet.getColumnIndex('rootNumber'));
+          const name = resultSet.getString(resultSet.getColumnIndex('name'));
+          const entityType = resultSet.getLong(resultSet.getColumnIndex('entityType'));
+          const fileSizeStr = resultSet.getString(resultSet.getColumnIndex('fileSizeStr'));
+          const taskId = resultSet.getString(resultSet.getColumnIndex('taskId'));
+          const url = resultSet.getString(resultSet.getColumnIndex('url'));
+          const filePath = resultSet.getString(resultSet.getColumnIndex('filePath'));
+          const fileName = resultSet.getString(resultSet.getColumnIndex('fileName'));
+          const fileSize = resultSet.getLong(resultSet.getColumnIndex('fileSize'));
+          const downloadSize = resultSet.getLong(resultSet.getColumnIndex('downLoadSize'));
+          const status = resultSet.getLong(resultSet.getColumnIndex('status'))
+          const downloadId = resultSet.getString(resultSet.getColumnIndex('downloadId'))
+          const begins = resultSet.getLong(resultSet.getColumnIndex('begins'))
+          let studyMaterial: StudyMaterial =
+            new StudyMaterial(userId, entityNumber, parentNumber, rootNumber, name, entityType, fileSizeStr, taskId,
+              url, filePath, fileName, fileSize, downloadSize, status, downloadId, begins)
+          list.push(studyMaterial);
         }
         resolve(list);
         resultSet?.close()
