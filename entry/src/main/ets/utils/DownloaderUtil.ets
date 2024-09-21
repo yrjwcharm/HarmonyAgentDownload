@@ -117,25 +117,25 @@ export class DownloaderUtil {
           predicates.equalTo('downloadId', (data as API_COMMON_INTERFACE.IStudyMaterial).entityNumber)
         }
         let progressCallback = (progress: request.agent.Progress) => {
-          DownloadManager.getInstance()
+          DownloadManager
             .progressCallback(moduleType, valuesBuket, progress, downloadTask,
               predicates as relationalStore.RdbPredicates, item, maxObj,
               callback);
         }
         let completedCallback = (progress: request.agent.Progress) => {
-          DownloadManager.getInstance()
+          DownloadManager
             .completedCallback(moduleType, valuesBuket, progress, downloadTask,
               predicates as relationalStore.RdbPredicates, item, maxObj,
               callback);
         };
         let pauseCallback = (progress: request.agent.Progress) => {
-          DownloadManager.getInstance()
+          DownloadManager
             .pausedCallback(moduleType, valuesBuket, progress, downloadTask,
               predicates as relationalStore.RdbPredicates, callback);
 
         }
         let failedCallback = (progress: request.agent.Progress) => {
-          DownloadManager.getInstance()
+          DownloadManager
             .failedCallback(moduleType, valuesBuket, progress, downloadTask,
               predicates as relationalStore.RdbPredicates, callback);
         }

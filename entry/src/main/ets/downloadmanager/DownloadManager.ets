@@ -9,15 +9,6 @@ import { JSON } from '@kit.ArkTS';
 import { FileUtil } from '../utils/FileUtil';
 
 export class DownloadManager {
-  private static instance: DownloadManager;
-
-  public static getInstance() {
-    if (!DownloadManager.instance) {
-      DownloadManager.instance = new DownloadManager();
-    }
-    return DownloadManager.instance;
-  }
-
   //退出App暂停
   public static async exitAppPause(context: Context) {
     DownloadManager.pauseAllCacheCourse(context, 1);
@@ -63,7 +54,7 @@ export class DownloadManager {
     return package_1;
   }
 
-  public async progressCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public static async progressCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
     item: API_COMMON_INTERFACE.IPackage,
@@ -118,7 +109,7 @@ export class DownloadManager {
     }
   }
 
-  public async completedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public static async completedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
     item: API_COMMON_INTERFACE.IPackage,
@@ -145,7 +136,7 @@ export class DownloadManager {
     }
   }
 
-  public async pausedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public static async pausedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,) {
@@ -161,7 +152,7 @@ export class DownloadManager {
     }
   }
 
-  public async failedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
+  public static async failedCallback(moduleType: number, valuesBuket: ValuesBucket, progress: request.agent.Progress,
     downloadTask: request.agent.Task,
     predicates: relationalStore.RdbPredicates,
     callback: (proceed: number, fileSize: number, status: number, id: string, taskId?: string) => void,
