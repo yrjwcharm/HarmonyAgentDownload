@@ -59,6 +59,7 @@ struct MultiFileDownload {
         }
       })
     })
+    this.downloadList = [...this.downloadList]
   }
 
   build() {
