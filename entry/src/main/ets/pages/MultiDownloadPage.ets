@@ -42,6 +42,9 @@ struct MultiFileDownload {
 
   async aboutToAppear() {
     this.initData();
+    getContext().eventHub.on('emitTrigger', () => {
+      this.initData();
+    })
   }
 
   async initData() {

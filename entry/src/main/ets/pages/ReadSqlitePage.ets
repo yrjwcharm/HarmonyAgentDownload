@@ -153,7 +153,7 @@ struct ReadSqlitePage {
                     status: item.status,
                     begins: item.begins ?? 0,
                   }], (downloadSize, fileSize, status, id) => {
-
+                    getContext().eventHub.emit('emitTrigger', true);
                   })
 
                 }
