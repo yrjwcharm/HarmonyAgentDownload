@@ -4,6 +4,7 @@ import { window } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
 import { relationalStore } from '@kit.ArkData';
 import { request } from '@kit.BasicServicesKit';
+import { DownloadManager } from '../downloadmanager/DownloadManager';
 
 
 export default class EntryAbility extends UIAbility {
@@ -15,18 +16,21 @@ export default class EntryAbility extends UIAbility {
 
   async onDestroy() {
     let predicates = new relationalStore.RdbPredicates('downloadinfo');
-    predicates.equalTo('userID', '1');
-    predicates.equalTo('status', 2)
+    predicates.equalTo('status', 2).or()
+    predicates.equalTo('status', 0)
+    predicates
     let list = await SqliteHelper.getInstance(this.context).queryData(predicates)
     for (let i = 0; i < list.length; i++) {
       let predicates = new relationalStore.RdbPredicates('downloadinfo');
       await request.agent.remove(list[i].taskId);
       predicates.equalTo('downloadId', list[i].downloadId)
-      await SqliteHelper.getInstance(this.context).update({
-        'status': 0
-      }, predicates)
+      DownloadManager.writeTmpBytes(this.context, list[i].fileName, async bytes => {
+        await SqliteHelper.getInstance(context).update({
+          'status': 0,
+          begins: bytes,
+        }, predicates)
+      })
     }
-
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage) {
