@@ -2,9 +2,7 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import SqliteHelper from '../db/SqliteHelper';
-import { relationalStore } from '@kit.ArkData';
-import { request } from '@kit.BasicServicesKit';
-import { FileUtil } from '../utils/FileUtil';
+import { PreferencesUtil } from '../utils/PreferencesUtil';
 
 
 export default class EntryAbility extends UIAbility {
@@ -12,27 +10,6 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
     console.log('MyAbility onCreate');
   }
-
-
-  async onDestroy() {
-    let predicates = new relationalStore.RdbPredicates('downloadinfo');
-    predicates.equalTo('status', 2).or()
-    predicates.equalTo('status', 0)
-    predicates
-    let list = await SqliteHelper.getInstance(this.context).queryData(predicates)
-    for (let i = 0; i < list.length; i++) {
-      let predicates = new relationalStore.RdbPredicates('downloadinfo');
-      await request.agent.remove(list[i].taskId);
-      predicates.equalTo('downloadId', list[i].downloadId)
-      FileUtil.writeTmpBytes(this.context, list[i].fileName, async bytes => {
-        await SqliteHelper.getInstance(this.context).update({
-          'status': 0,
-          begins: bytes,
-        }, predicates)
-      })
-    }
-  }
-
   async onWindowStageCreate(windowStage: window.WindowStage) {
     // StatusBarManager.immerseFullScreenAsync(windowStage)
     await SqliteHelper.getInstance(this.context)?.initRDB();
@@ -57,6 +34,6 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onBackground() {
-
+    PreferencesUtil.putSync('store',1);
   }
 }

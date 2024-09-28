@@ -143,13 +143,19 @@ struct ReadSqlitePage {
                   right: 16
                 })
               }.onClick(async () => {
+                // try {
+                //   const taskObj = await request.agent.getTask(getContext(), item.taskId);
+                //   // await taskObj.pause();
+                //   request.agent.remove(taskObj.tid);
+                // } catch (e) {
+                //   console.log('暂停异常',e.message);
+                // }
                 if (item.status === 2) {
                   DownloaderUtil.pause(item.taskId);
 
                 } else if (item.status === 0) {
-
-                  try {
                     const taskObj = await request.agent.getTask(getContext(), item.taskId);
+                  try {
                     if (taskObj.config.ends === -1) {
                       DownloaderUtil.downloadFile([{
                         id: item.downloadId,

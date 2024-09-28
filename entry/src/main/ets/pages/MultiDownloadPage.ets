@@ -3,6 +3,10 @@ import SqliteHelper from '../db/SqliteHelper';
 import { DownloaderUtil, IDownload } from '../utils/DownloaderUtil';
 import { relationalStore } from '@kit.ArkData';
 import { DownloadStatus } from '../constants/DownloadStatus';
+import { request } from '@kit.BasicServicesKit';
+import { FileUtil } from '../utils/FileUtil';
+import { PreferencesUtil } from '../utils/PreferencesUtil';
+import { fileIo } from '@kit.CoreFileKit';
 
 @Entry
 @Component
@@ -36,11 +40,34 @@ struct MultiFileDownload {
       pro: 0,
       begins: 0,
       status: 3,
-    }
-
+    },
   ]
 
   async aboutToAppear() {
+    if(PreferencesUtil.hasSync('store')) {
+      let predicates = new relationalStore.RdbPredicates('downloadinfo');
+      predicates.equalTo('status', 2).or()
+      predicates.equalTo('status', 0)
+      predicates
+      let list = await SqliteHelper.getInstance(getContext()).queryData(predicates)
+      for (let i = 0; i < list.length; i++) {
+        let predicates = new relationalStore.RdbPredicates('downloadinfo');
+        predicates.equalTo('downloadId', list[i].downloadId)
+        await request.agent.remove(list[i].taskId);
+        FileUtil.writeTmpBytes(getContext(), list[i].fileName, async bytes => {
+          let file = fileIo.openSync(list[i].filePath+'/tmp/'+list[i].fileName, fileIo.OpenMode.READ_WRITE);
+          let buf = new ArrayBuffer(fileIo.statSync(file.fd).size);
+          fileIo.readSync(file.fd, buf);
+          fileIo.closeSync(file);
+          await SqliteHelper.getInstance(getContext()).update({
+            'status': 0,
+            begins: buf.byteLength,
+          }, predicates)
+        })
+
+      }
+      PreferencesUtil.deleteSync('store');
+    }
     this.initData();
     getContext().eventHub.on('trigger', () => {
       this.initData();
