@@ -54,7 +54,7 @@ struct MultiFileDownload {
         let predicates = new relationalStore.RdbPredicates('downloadinfo');
         predicates.equalTo('downloadId', list[i].downloadId)
         await request.agent.remove(list[i].taskId);
-        FileUtil.writeTmpBytes(getContext(), list[i].fileName, async bytes => {
+        FileUtil.writeTmpBytes(getContext(), list[i].fileName);
           let file = fileIo.openSync(list[i].filePath+'/tmp/'+list[i].fileName, fileIo.OpenMode.READ_WRITE);
           let buf = new ArrayBuffer(fileIo.statSync(file.fd).size);
           fileIo.readSync(file.fd, buf);
@@ -63,8 +63,6 @@ struct MultiFileDownload {
             'status': 0,
             begins: buf.byteLength,
           }, predicates)
-        })
-
       }
       PreferencesUtil.deleteSync('store');
     }

@@ -5,7 +5,7 @@ import fileIo from '@ohos.file.fs';
  */
 export class FileUtil {
   //视频文件下载读取字节数据、然后给目标临时文件tmp写入数据
-  public static readFileBytes(srcPath: string, dstPath: string, callback?: (bytes: number) => void) {
+  public static readFileBytes(srcPath: string, dstPath: string) {
     if (fileIo.accessSync(srcPath)) {
       //读取数据
       let file = fileIo.openSync(srcPath, fileIo.OpenMode.READ_WRITE);
@@ -18,7 +18,6 @@ export class FileUtil {
           fileIo.openSync(dstPath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.APPEND);
         let writeLen = fileIo.writeSync(file0.fd, buf);
         console.info("write data to file succeed and size is:" + writeLen);
-        callback && callback(writeLen);
         fileIo.closeSync(file0);
       } catch (e) {
       }
@@ -37,7 +36,7 @@ export class FileUtil {
   }
 
   //把下载的视频字节数存储到临时文件夹下面
-  public static writeTmpBytes(context: Context, fileName: string, callback?: (bytes: number) => void) {
+  public static writeTmpBytes(context: Context, fileName: string){
     try {
       let srcPath = context.cacheDir + "/" + fileName;
       let dstPath = context.cacheDir + "/tmp";
@@ -49,7 +48,7 @@ export class FileUtil {
       dstPath = dstPath + '/' + fileName
       let stream = fileIo.createStreamSync(dstPath, "a+");
       stream.closeSync();
-      FileUtil.readFileBytes(srcPath, dstPath, callback);
+      FileUtil.readFileBytes(srcPath, dstPath);
     } catch (e) {
       console.log('异常信息', e);
     }

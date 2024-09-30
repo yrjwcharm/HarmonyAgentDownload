@@ -66,7 +66,6 @@ export class DownloadManager {
       valuesBuket.fileSize = progress.sizes[0] + (valuesBuket.begins as number)
       valuesBuket.downloadSize = progress.processed + (valuesBuket.begins as number)
       valuesBuket.status = DownloadStatus.PAUSE;
-      valuesBuket.begins = progress.processed + (valuesBuket.begins as number);
       await SqliteHelper.getInstance(getContext()).update(valuesBuket, predicates)
       callback(valuesBuket.downloadSize, valuesBuket.fileSize, DownloadStatus.PAUSE,
         valuesBuket.downloadId as string,
